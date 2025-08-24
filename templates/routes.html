@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% load route_properties %}
+
+{% block title %}
+    | Route Planner
+{% endblock title %}
+
+{% block body %}
+<link rel="stylesheet" href="{% static 'css/routes.css' %}">
+
+<div class="route-container">
+    <header class="route-header">
+        <h1>Route Preview</h1>
+        <p>
+            <span class="highlight" id="from_station_text">{{ from_station }}</span> →  
+            <span class="highlight" id="to_station_text">{{ to_station }}</span>
+        </p>
+    </header>
+
+    {% if path %}
+        <div class="route-summary">
+            <div class="summary-item">
+                <h3>{{ num_stations }}</h3>
+                <p>Stations</p>
+            </div>
+            <div class="summary-item">
+                <h3>{{ total_distance }} km</h3>
+                <p>Total Distance</p>
+            </div>
+            <div class="summary-item">
+                <h3>~{{ travel_time }} min</h3>
+                <p>Estimated Time</p>
+            </div>
+            <div class="summary-item">
+                <h3>{{ num_transfers }}</h3>
+                <p>Transfers</p>
+            </div>
+        </div>
+
+        <div class="timeline">
+            {% for segment in route_segments %}
+                {% for station in segment.stations %}
+                    <div class="timeline-item 
+                        {% if forloop.first and forloop.parentloop.first %}start{% elif forloop.last and forloop.parentloop.last %}end{% else %}station{% endif %}" 
+                        style="--line-color: {{ segment.route_id|route_color }};"
+                        title="{{ segment.route_id|route_name }}">
+                        <div class="marker"></div>
+                        <div class="details">
+                            <h4>{{ station }}</h4>
+                            {% if forloop.first and forloop.parentloop.first %}
+                                <p class="small">Start ({{ segment.route_id|route_name }})</p>
+                            {% elif forloop.last and forloop.parentloop.last %}
+                                <p class="small">Destination ({{ segment.route_id|route_name }})</p>
+                            {% elif forloop.first %}
+                                <p class="small" style="color: rgb(165, 199, 70);">Board {{ segment.route_id|route_name }}</p>
+                            {% elif forloop.last %}
+                                <p class="small transfer" style="color: rgb(219, 199, 15);">Transfer to next route</p>
+                            {% else %}
+                                <p class="small">{{ segment.route_id|route_name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="empty-state">
+            <h3>No route found</h3>
+            <p>We couldn’t find a connection between 
+               <strong>{{ from_station }}</strong> and 
+               <strong>{{ to_station }}</strong>.</p>
+            <a href="/" class="btn">Plan Another Route</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock body %}

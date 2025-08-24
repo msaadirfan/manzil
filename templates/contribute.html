@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    | Contribute
+{% endblock title %}
+
+{% block body %}
+<link rel="stylesheet" href="{% static 'css/contribute.css' %}">
+
+<div class="contribute-container">
+    <h1>Contribute to Manzil</h1>
+    <p class="subtitle">Help us improve by sharing your feedback, corrections, or suggestions.</p>
+
+    <form method="post" class="contribute-form" action="/contribute">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="desc">Tell us your reason for contact</label>
+        <textarea class="form-control my-3" id="desc" rows="6" name="desc" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Contribution</button>
+    </form>
+</div>
+{% endblock body %}
