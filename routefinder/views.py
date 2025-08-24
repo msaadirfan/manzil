@@ -41,6 +41,8 @@ def contribute(request):
 def home(request):
     return render(request,'home.html')
 
+def map(request):
+    return render(request,'map.html')
 
 def station_search(request):
     query = request.GET.get("q", "")

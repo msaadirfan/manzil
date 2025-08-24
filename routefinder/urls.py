@@ -7,5 +7,6 @@ urlpatterns=[
     path('contact',views.contact,name='contact'),
     path('home',views.home,name='home'),
     path('stations/',views.station_search,name='station_search'),
-    path('find_route',views.find_route,name='find_route')
+    path('find_route',views.find_route,name='find_route'),
+    path('map',views.map,name='map'),
     ]
