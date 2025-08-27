@@ -1,0 +1,49 @@
+
+body {
+    background-color: #242424
+    ;
+    color: #e0e0e0;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #111 !important;
+    transition: background-color 0.3s ease;
+}
+
+.navbar .navbar-brand {
+    color: #ffffff !important;
+    letter-spacing: 1px;
+}
+
+.navbar .nav-link {
+    color: #b0b0b0 !important;
+    margin-left: 1rem;
+    transition: color 0.2s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+    color: #ffffff !important;
+    font-weight: 500;
+}
+
+
+.alert {
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+
+.btn-primary {
+    background-color: #1db954;
+    border: none;
+    font-weight: 500;
+    padding: 0.6rem 1.3rem;
+    border-radius: 8px;
+}
+
+.btn-primary:hover {
+    background-color: #1aa34a;
+}

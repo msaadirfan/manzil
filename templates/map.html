@@ -1,8 +1,38 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}
     | Map 
 {% endblock title %}
 
 {% block body %}
-This is the map page
+
+<div id="map-container" style="width:100%; height:80vh;touch-action: none;  overflow:hidden;">
+    <img id="map-image" src="{% static 'images/karachi_metro_map.png' %}" alt="Karachi Bus Route Map" style="width:100%; height:auto; display:block; padding-top: 20px;"/>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<script>
+    const element = document.getElementById('map-image');
+    const panzoom = Panzoom(element, {
+        maxScale: 5,
+        minScale: 1,
+        contain: 'outside',
+        cursor: 'move'
+    });
+
+    element.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
+    element.parentElement.addEventListener('pointerdown', function(e) {
+        panzoom.handleDown(e);
+    });
+    element.parentElement.addEventListener('pointermove', function(e) {
+        panzoom.handleMove(e);
+    });
+    element.parentElement.addEventListener('pointerup', function(e) {
+        panzoom.handleUp(e);
+    });
+    element.parentElement.addEventListener('pointerleave', function(e) {
+        panzoom.handleUp(e);
+    });
+</script>
 {% endblock body %}
