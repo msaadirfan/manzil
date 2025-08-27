@@ -1,4 +1,3 @@
-/* Container */
 .contribute-container {
     max-width: 600px;
     margin: 40px auto;
@@ -58,7 +57,7 @@
     outline: none;
 }
 
-/* Button */
+
 .btn-submit {
     width: 100%;
     padding: 14px;

@@ -1,8 +1,8 @@
-/* Footer */
+
 .site-footer {
-    background: #111;             /* darker than main container */
+    background: #111;             
     color: #aaa;
-    padding: 60px 20px 30px;      /* tall for page length */
+    padding: 60px 20px 30px;     
     margin-top: 60px;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -36,7 +36,7 @@
     transition: color .2s ease;
 }
 .footer-links a:hover {
-    color: #0aad0a; /* green accent */
+    color: #0aad0a; 
 }
 
 .footer-copy {

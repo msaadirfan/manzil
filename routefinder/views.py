@@ -55,7 +55,6 @@ def station_search(request):
     return JsonResponse(results, safe=False)
 
 def find_route(request):
-    """Enhanced route finding with route information"""
     if request.method == "POST":
         from django.contrib import messages
         from django.shortcuts import render
@@ -75,13 +74,13 @@ def find_route(request):
             return render(request, "home.html")
         
         try:
-            # Build graph with route information
+           
             print("Building transit map with routes...")
             graph, route_info, routes_per_station = transit_map(debug=True)
             
             print(f"\nSearching from '{from_station}' to '{to_station}'")
             
-            # Check if stations exist
+           
             if from_station not in graph:
                 messages.error(request, f"Start station '{from_station_raw}' not found.")
                 return render(request, "home.html")
@@ -90,20 +89,16 @@ def find_route(request):
                 messages.error(request, f"Destination station '{to_station_raw}' not found.")
                 return render(request, "home.html")
             
-            # Run enhanced Dijkstra
             cost, path_with_routes = dijkstra(graph, route_info, from_station, to_station, debug=True)
             
             if cost == float("inf"):
                 messages.error(request, f"No route found between {from_station} and {to_station}.")
                 return render(request, "home.html")
             
-            # Analyze the path to get route segments
             route_segments = analyze_route_path(path_with_routes)
             
-            # Calculate transfers
             num_transfers = max(0, len(route_segments) - 1)
             
-            # Get all stations for the simple path
             simple_path = [station_info['station'] for station_info in path_with_routes]
             avg_speed_of_bus=26
             travel_time=(cost/avg_speed_of_bus)*60
@@ -113,7 +108,7 @@ def find_route(request):
                 {
                     "from_station": from_station,
                     "to_station": to_station,
-                    "path": simple_path,  # For backward compatibility
+                    "path": simple_path,  
                     "path_with_routes": path_with_routes,
                     "route_segments": route_segments,
                     "total_distance": round(cost, 2),

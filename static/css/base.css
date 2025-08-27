@@ -1,6 +1,4 @@
-/* base.css */
 
-/* General dark background */
 body {
     background-color: #242424
     ;
@@ -31,13 +29,13 @@ body {
     font-weight: 500;
 }
 
-/* Flash messages */
+
 .alert {
     border-radius: 8px;
     font-size: 0.95rem;
 }
 
-/* Buttons */
+
 .btn-primary {
     background-color: #1db954;
     border: none;

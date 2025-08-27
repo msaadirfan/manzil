@@ -1,7 +1,7 @@
 import heapq
 
 def dijkstra(transit_map, route_info, source_node, target_node, debug=False):
-    """Enhanced Dijkstra that tracks route information"""
+    
     
     if source_node not in transit_map:
         available_stations = list(transit_map.keys())[:10]
@@ -18,7 +18,7 @@ def dijkstra(transit_map, route_info, source_node, target_node, debug=False):
         print(f"Source: '{source_node}'")
         print(f"Target: '{target_node}'")
     
-    # Format: (cost, node, path_with_routes, current_route)
+    
     queue = [(0, source_node, [{'station': source_node, 'route': None, 'is_transfer': False}], None)]
     seen = set()
     iterations = 0
@@ -46,13 +46,13 @@ def dijkstra(transit_map, route_info, source_node, target_node, debug=False):
         
         for neighbor, weight in neighbors.items():
             if neighbor not in seen:
-                # Get the route for this connection
+              
                 next_route = route_info.get(node, {}).get(neighbor)
                 
-                # Determine if this is a transfer
+              
                 is_transfer = current_route is not None and current_route != next_route
                 
-                # Create new path entry
+                
                 new_path_entry = {
                     'station': neighbor,
                     'route': next_route,
@@ -70,7 +70,7 @@ def dijkstra(transit_map, route_info, source_node, target_node, debug=False):
     return (float("inf"), [])
 
 def analyze_route_path(path_with_routes):
-    """Analyze the path to extract route segments and transfers"""
+    
     if not path_with_routes or len(path_with_routes) < 2:
         return []
     
@@ -83,7 +83,7 @@ def analyze_route_path(path_with_routes):
         'end_station': None
     }
     
-    # Start with the first station
+    
     first_station = path_with_routes[0]
     
     for i, station_info in enumerate(path_with_routes[1:], 1):
@@ -92,20 +92,17 @@ def analyze_route_path(path_with_routes):
         distance = station_info.get('distance_from_prev', 0)
         
         if current_segment['route_id'] is None:
-            # Starting first segment
+            
             current_segment['route_id'] = route_id
             current_segment['stations'] = [path_with_routes[0]['station']]
             current_segment['start_station'] = path_with_routes[0]['station']
         
         if route_id == current_segment['route_id']:
-            # Continue current segment
             current_segment['stations'].append(station_name)
             current_segment['distance'] += distance
             current_segment['end_station'] = station_name
         else:
-            # Route change - finish current segment and start new one
             segments.append(current_segment.copy())
-            
             current_segment = {
                 'route_id': route_id,
                 'stations': [path_with_routes[i-1]['station'], station_name],
@@ -114,7 +111,6 @@ def analyze_route_path(path_with_routes):
                 'end_station': station_name
             }
     
-    # Add the last segment
     if current_segment['stations']:
         segments.append(current_segment)
     
@@ -122,7 +118,6 @@ def analyze_route_path(path_with_routes):
 
 
 def get_connected_component(graph, start_node):
-    """Get all nodes reachable from start_node using BFS"""
     visited = set()
     queue = [start_node]
     

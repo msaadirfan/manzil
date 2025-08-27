@@ -2,21 +2,18 @@ from collections import defaultdict
 from routefinder.models import Station
 from routefinder.models import Route
 from dijkstras import get_connected_component
-def normalize(name: str) -> str:
-    """Normalize station names for consistent matching"""
+
+def normalize(name: str) -> str: 
     if not name:
         return ""
     return " ".join(name.strip().split()).title()
 
 def transit_map(debug=False):
-    """Build transit graph with route information"""
     graph = defaultdict(dict)
-    route_info = defaultdict(dict)  # Store route information for each connection
-    routes_per_station = defaultdict(set)  # Track which routes serve each station
-    
+    route_info = defaultdict(dict) 
+    routes_per_station = defaultdict(set)  
     routes = Route.objects.select_related("from_station", "to_station")
     
-    # Initialize all stations in graph
     station_names = set()
     for station in Station.objects.all():
         normalized_name = normalize(station.station_name)
@@ -26,7 +23,7 @@ def transit_map(debug=False):
     if debug:
         print(f"Total stations loaded: {len(station_names)}")
     
-    # Add routes (bidirectional) with route information
+    
     route_count = 0
     for route in routes:
         from_name = normalize(route.from_station.station_name)
@@ -34,15 +31,13 @@ def transit_map(debug=False):
         distance = float(route.distance_kms)
         route_id = route.route_id
         
-        # Add bidirectional edges
+       
         graph[from_name][to_name] = distance
         graph[to_name][from_name] = distance
         
-        # Store route information for both directions
         route_info[from_name][to_name] = route_id
         route_info[to_name][from_name] = route_id
         
-        # Track which routes serve each station
         routes_per_station[from_name].add(route_id)
         routes_per_station[to_name].add(route_id)
         
@@ -56,7 +51,6 @@ def transit_map(debug=False):
 
 
 def find_station_by_partial_name(partial_name):
-    """Helper function to find stations matching partial name"""
     normalized_partial = normalize(partial_name)
     matches = []
     
@@ -69,15 +63,12 @@ def find_station_by_partial_name(partial_name):
 
 
 def validate_graph_connectivity(graph):
-    """Validate that the graph is properly connected"""
     issues = []
     
-    # Check for isolated stations
     isolated = [station for station, connections in graph.items() if not connections]
     if isolated:
         issues.append(f"Isolated stations (no connections): {len(isolated)} stations")
     
-    # Check for disconnected components
     all_stations = set(graph.keys())
     visited_global = set()
     components = []
@@ -94,10 +85,8 @@ def validate_graph_connectivity(graph):
     return issues
 
 def diagnose_graph_issues():
-    """Run this in Django shell to diagnose issues"""
     print("=== GRAPH DIAGNOSIS ===")
     
-    # Check database connectivity
     station_count = Station.objects.count()
     route_count = Route.objects.count()
     print(f"Stations in DB: {station_count}")
@@ -111,18 +100,16 @@ def diagnose_graph_issues():
         print("ERROR: No routes found in database!")
         return
     
-    # Build and analyze graph
     graph = transit_map(debug=True)
     issues = validate_graph_connectivity(graph)
     
     if not issues:
-        print("✅ Graph appears to be properly connected!")
+        print("Graph appears to be properly connected!")
     else:
-        print("⚠️ Graph connectivity issues found:")
+        print("Graph connectivity issues found:")
         for issue in issues:
             print(f"  - {issue}")
     
-    # Test with a few station pairs
     connected_stations = [s for s, conn in graph.items() if conn]
     if len(connected_stations) >= 2:
         test_source = connected_stations[0]
@@ -131,6 +118,6 @@ def diagnose_graph_issues():
         cost, path = dijkstra_debug(graph, test_source, test_target, debug=True)
         
         if cost != float("inf"):
-            print(f"✅ Test route successful! Distance: {cost}")
+            print(f"Test route successful! Distance: {cost}")
         else:
-            print("❌ Test route failed!")
+            print("Test route failed!")
