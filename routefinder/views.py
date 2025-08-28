@@ -8,6 +8,7 @@ from dijkstras import dijkstra, analyze_route_path
 from transit import transit_map, normalize, find_station_by_partial_name, validate_graph_connectivity
 from .models import Station
 from .models import Route
+from django_ratelimit.decorators import ratelimit
 
 # Create your views here.
 def index(request):
@@ -123,3 +124,10 @@ def find_route(request):
             print(f"Error in route finding: {str(e)}")
             messages.error(request, f"An error occurred while finding the route: {str(e)}")
             return render(request, "home.html")
+
+
+
+@ratelimit(key='ip', rate='5/m', block=True)
+def contact_view(request):
+    message.error(request, f"Too many requests are being sent, limit reached.")
+    return render(request, "home.html")
