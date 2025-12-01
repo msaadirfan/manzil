@@ -9,9 +9,15 @@ def normalize(name: str) -> str:
     return " ".join(name.strip().split()).title()
 
 def transit_map(debug=False):
+    """
+    Builds a graph where:
+    - graph[station][neighbor] = distance
+    - route_info[station][neighbor] = LIST of all routes connecting them
+    - routes_per_station[station] = set of all routes serving that station
+    """
     graph = defaultdict(dict)
-    route_info = defaultdict(dict) 
-    routes_per_station = defaultdict(set)  
+    route_info = defaultdict(lambda: defaultdict(list))  # Now stores LISTS of routes
+    routes_per_station = defaultdict(set)
     routes = Route.objects.select_related("from_station", "to_station")
     
     station_names = set()
@@ -23,7 +29,6 @@ def transit_map(debug=False):
     if debug:
         print(f"Total stations loaded: {len(station_names)}")
     
-    
     route_count = 0
     for route in routes:
         from_name = normalize(route.from_station.station_name)
@@ -31,12 +36,15 @@ def transit_map(debug=False):
         distance = float(route.distance_kms)
         route_id = route.route_id
         
-       
+        # Store the edge (bidirectional)
         graph[from_name][to_name] = distance
         graph[to_name][from_name] = distance
         
-        route_info[from_name][to_name] = route_id
-        route_info[to_name][from_name] = route_id
+        # Store ALL routes for this edge (not just one)
+        if route_id not in route_info[from_name][to_name]:
+            route_info[from_name][to_name].append(route_id)
+        if route_id not in route_info[to_name][from_name]:
+            route_info[to_name][from_name].append(route_id)
         
         routes_per_station[from_name].add(route_id)
         routes_per_station[to_name].add(route_id)
@@ -100,7 +108,7 @@ def diagnose_graph_issues():
         print("ERROR: No routes found in database!")
         return
     
-    graph = transit_map(debug=True)
+    graph, route_info, routes_per_station = transit_map(debug=True)
     issues = validate_graph_connectivity(graph)
     
     if not issues:
@@ -115,7 +123,8 @@ def diagnose_graph_issues():
         test_source = connected_stations[0]
         test_target = connected_stations[1]
         print(f"\n=== TESTING ROUTE: {test_source} → {test_target} ===")
-        cost, path = dijkstra_debug(graph, test_source, test_target, debug=True)
+        from dijkstras import dijkstra
+        cost, path = dijkstra(graph, route_info, test_source, test_target, debug=True)
         
         if cost != float("inf"):
             print(f"Test route successful! Distance: {cost}")
