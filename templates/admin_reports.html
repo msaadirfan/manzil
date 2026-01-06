@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    | Admin - Reports Dashboard
+{% endblock title %}
+
+{% block body %}
+<style>
+.admin-container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #1a1a1a;
+    border-radius: 10px;
+}
+
+.dashboard-header {
+    margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #252525;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #4a90e2;
+}
+
+.stat-card.critical {
+    border-left-color: #ff4444;
+}
+
+.stat-card.high {
+    border-left-color: #ff9800;
+}
+
+.stat-card h3 {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.stat-card .number {
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.reports-section {
+    margin-bottom: 40px;
+}
+
+.section-header {
+    color: #fff;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+}
+
+.report-card {
+    background: #252525;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid #666;
+    transition: transform 0.2s;
+}
+
+.report-card:hover {
+    transform: translateX(5px);
+}
+
+.report-card.priority-1 {
+    border-left-color: #ff4444;
+    background: #2a1a1a;
+}
+
+.report-card.priority-2 {
+    border-left-color: #ff9800;
+    background: #2a2519;
+}
+
+.report-card.priority-3 {
+    border-left-color: #ffc107;
+}
+
+.report-card.priority-4,
+.report-card.priority-5 {
+    border-left-color: #4caf50;
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.report-type {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.type-harassment {
+    background: #ff4444;
+    color: white;
+}
+
+.type-safety_hazard {
+    background: #ff9800;
+    color: white;
+}
+
+.type-staff_behaviour {
+    background: #ffc107;
+    color: #000;
+}
+
+.type-cleanliness {
+    background: #4caf50;
+    color: white;
+}
+
+.type-other {
+    background: #2196f3;
+    color: white;
+}
+
+.priority-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.priority-1 .priority-badge {
+    background: #ff4444;
+    color: white;
+}
+
+.priority-2 .priority-badge {
+    background: #ff9800;
+    color: white;
+}
+
+.priority-3 .priority-badge {
+    background: #ffc107;
+    color: #000;
+}
+
+.priority-4 .priority-badge,
+.priority-5 .priority-badge {
+    background: #4caf50;
+    color: white;
+}
+
+.report-details {
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.report-details p {
+    margin: 5px 0;
+}
+
+.report-details strong {
+    color: #fff;
+}
+
+.report-description {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 6px;
+    color: #ddd;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.report-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-resolve {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-resolve:hover {
+    background: #45a049;
+}
+
+.btn-delete {
+    background: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #da190b;
+}
+
+.admin-notes {
+    margin-top: 10px;
+}
+
+.admin-notes textarea {
+    width: 100%;
+    padding: 10px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #eee;
+    resize: vertical;
+}
+
+.no-reports {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+}
+
+.resolved-report {
+    opacity: 0.7;
+}
+
+.resolved-badge {
+    background: #4caf50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: #252525;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: #1159ac;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+</style>
+
+<div class="admin-container">
+    <div class="dashboard-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h1>Reports Dashboard</h1>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <span style="color: #888;">👤 {{ admin_user.username }}</span>
+                <a href="{% url 'admin_logout' %}" class="btn btn-logout" style="padding: 8px 16px; background: #f44336; color: white; text-decoration: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600;">
+                     Logout
+                </a>
+            </div>
+        </div>
+        <p style="color: #888;">Priority-based incident management system</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Reports</h3>
+            <div class="number">{{ total_reports }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Pending</h3>
+            <div class="number">{{ pending_count }}</div>
+        </div>
+        <div class="stat-card critical">
+            <h3>🔴 Critical</h3>
+            <div class="number">{{ critical_count }}</div>
+        </div>
+        <div class="stat-card high">
+            <h3>🟠 High Priority</h3>
+            <div class="number">{{ high_priority_count }}</div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('pending')">Pending Reports ({{ pending_count }})</button>
+        <button class="tab-btn" onclick="switchTab('resolved')">Resolved Reports</button>
+    </div>
+
+    <!-- Pending Reports Tab -->
+    <div id="pending-tab" class="tab-content active">
+        <div class="reports-section">
+            <h2 class="section-header">Pending Reports</h2>
+            
+            {% if pending_reports %}
+                {% for report in pending_reports %}
+                <div class="report-card priority-{{ report.priority_level }}">
+                    <div class="report-header">
+                        <div>
+                            <span class="report-type type-{{ report.report_type }}">
+                                {{ report.get_report_type_display }}
+                            </span>
+                            <span class="priority-badge">
+                                Priority {{ report.priority_level }}
+                            </span>
+                        </div>
+                        <div style="color: #888; font-size: 0.9rem;">
+                            {{ report.date|date:"M d, Y - H:i" }}
+                        </div>
+                    </div>
+                    
+                    <div class="report-details">
+                        <p><strong>Reporter:</strong> {{ report.name }}</p>
+                        <p><strong>Email:</strong> {{ report.email }}</p>
+                        <p><strong>Report ID:</strong> #{{ report.id }}</p>
+                    </div>
+                    
+                    <div class="report-description">
+                        <strong style="color: #fff;">Description:</strong><br>
+                        {{ report.description }}
+                    </div>
+                    
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="report_id" value="{{ report.id }}">
+                        
+                        <div class="admin-notes">
+                            <textarea 
+                                name="admin_notes" 
+                                placeholder="Add admin notes before resolving (optional)..."
+                                rows="2"></textarea>
+                        </div>
+                        
+                        <div class="report-actions">
+                            <button type="submit" name="action" value="resolve" class="btn btn-resolve">
+                                Mark as Resolved
+                            </button>
+                            <button type="submit" name="action" value="delete" class="btn btn-delete"
+                                    onclick="return confirm('Are you sure you want to delete this report?')">
+                                Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-reports">
+                    <h3>🎉 No pending reports!</h3>
+                    <p>All reports have been addressed.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Resolved Reports Tab -->
+    <div id="resolved-tab" class="tab-content">
+        <div class="reports-section">
+            <h2 class="section-header">Recently Resolved Reports</h2>
+            
+            {% if resolved_reports %}
+                {% for report in resolved_reports %}
+                <div class="report-card resolved-report priority-{{ report.priority_level }}">
+                    <div class="report-header">
+                        <div>
+                            <span class="report-type type-{{ report.report_type }}">
+                                {{ report.get_report_type_display }}
+                            </span>
+                            <span class="resolved-badge">Resolved</span>
+                        </div>
+                        <div style="color: #888; font-size: 0.9rem;">
+                            Resolved: {{ report.resolved_date|date:"M d, Y - H:i" }}
+                        </div>
+                    </div>
+                    
+                    <div class="report-details">
+                        <p><strong>Reporter:</strong> {{ report.name }}</p>
+                        <p><strong>Submitted:</strong> {{ report.date|date:"M d, Y - H:i" }}</p>
+                    </div>
+                    
+                    <div class="report-description">
+                        <strong style="color: #fff;">Description:</strong><br>
+                        {{ report.description }}
+                    </div>
+                    
+                    {% if report.admin_notes %}
+                    <div class="report-description" style="border-left: 3px solid #4caf50;">
+                        <strong style="color: #4caf50;">Admin Notes:</strong><br>
+                        {{ report.admin_notes }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-reports">
+                    <p>No resolved reports yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + '-tab').classList.add('active');
+    event.target.classList.add('active');
+}
+</script>
+
+{% endblock body %}

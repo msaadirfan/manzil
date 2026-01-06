@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}
-    | Contact
+    | Report an Issue
 {% endblock title %}
 
 {% block body %}
 <link rel="stylesheet" href="{% static 'css/contact.css' %}">
 
 <div class="contact-container">
-    <h1>Contact Us</h1>
-    <p class="subtitle">We’d love to hear from you. Fill out the form below and we’ll get back to you soon.</p>
+    <h1>Report an Issue</h1>
+    <p class="subtitle">Help us maintain a safe and comfortable transit experience. Your reports are prioritized based on urgency.</p>
 
-    <form method="post" class="contact-form" action="/contact">
+    <form method="post" class="contact-form" action="/contact" id="reportForm">
         {% csrf_token %}
 
         <div class="form-group">
-            <label for="name">Your Name</label>
+            <label for="name">Your Name <span class="required">*</span></label>
             <input 
                 type="text" 
                 id="name" 
@@ -25,27 +25,93 @@
         </div>
 
         <div class="form-group">
-            <label for="email">Your Email</label>
+            <label for="email">Your Email <span class="required">*</span></label>
             <input 
                 type="email" 
                 id="email" 
                 name="email" 
                 placeholder="Enter your email address" 
                 required>
-            <small class="form-text">We’ll never share your email with anyone else.</small>
+            <small class="form-text">We'll use this to follow up on your report if needed.</small>
         </div>
 
         <div class="form-group">
-            <label for="desc">Your Message</label>
+            <label for="report_type">Report Type <span class="required">*</span></label>
+            <select id="report_type" name="report_type" required>
+                <option value="">-- Select Issue Type --</option>
+                <option value="harassment" data-priority="🔴 CRITICAL">Harassment (Critical Priority)</option>
+                <option value="safety_hazard" data-priority="🟠 HIGH">Safety Hazard (High Priority)</option>
+                <option value="staff_behaviour" data-priority="🟡 MEDIUM">Staff Behaviour (Medium Priority)</option>
+                <option value="cleanliness" data-priority="🟢 LOW">Cleanliness (Low Priority)</option>
+                <option value="other" data-priority="🟢 LOW">Other (Low Priority)</option>
+            </select>
+            <div id="priorityIndicator" class="priority-indicator" style="display: none;"></div>
+        </div>
+
+        <div class="form-group" id="descriptionGroup" style="display: none;">
+            <label for="desc">Description <span class="required">*</span></label>
             <textarea 
                 id="desc" 
                 name="desc" 
-                rows="4" 
-                placeholder="Write your message here..." 
+                rows="5" 
+                placeholder="Please provide detailed information about the issue..."
                 required></textarea>
+            <small class="form-text" id="descHelper">Be as specific as possible: location, time, and details help us respond effectively.</small>
         </div>
 
-        <button type="submit" class="btn-submit">Send Message</button>
+        <button type="submit" class="btn-submit" id="submitBtn" disabled>Submit Report</button>
     </form>
+
+    <div class="info-box">
+        <h3>Priority Levels</h3>
+        <ul>
+            <li><strong>🔴 Critical:</strong> Harassment reports are addressed immediately</li>
+            <li><strong>🟠 High:</strong> Safety hazards investigated within 24 hours</li>
+            <li><strong>🟡 Medium:</strong> Staff behavior reviewed within 2-3 days</li>
+            <li><strong>🟢 Low:</strong> Cleanliness and other issues addressed within a week</li>
+        </ul>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const reportType = document.getElementById('report_type');
+    const descriptionGroup = document.getElementById('descriptionGroup');
+    const descTextarea = document.getElementById('desc');
+    const submitBtn = document.getElementById('submitBtn');
+    const priorityIndicator = document.getElementById('priorityIndicator');
+    const descHelper = document.getElementById('descHelper');
+
+    reportType.addEventListener('change', function() {
+        if (this.value) {
+            descriptionGroup.style.display = 'block';
+            descTextarea.required = true;
+            submitBtn.disabled = false;
+            
+            // Show priority indicator
+            const selectedOption = this.options[this.selectedIndex];
+            const priority = selectedOption.getAttribute('data-priority');
+            priorityIndicator.textContent = `Priority: ${priority}`;
+            priorityIndicator.style.display = 'block';
+            
+            // Update helper text based on report type
+            const helperTexts = {
+                'harassment': 'Please include: what happened, when, where, and any witnesses. Your safety is our top priority.',
+                'safety_hazard': 'Please specify: exact location, nature of hazard, and any immediate dangers.',
+                'staff_behaviour': 'Please include: staff member description, location, date/time, and what occurred.',
+                'cleanliness': 'Please specify: location, type of cleanliness issue, and how long it\'s been present.',
+                'other': 'Please provide as much detail as possible about your concern.'
+            };
+            descHelper.textContent = helperTexts[this.value] || 'Be as specific as possible.';
+            
+        } else {
+            descriptionGroup.style.display = 'none';
+            descTextarea.required = false;
+            submitBtn.disabled = true;
+            priorityIndicator.style.display = 'none';
+        }
+    });
+});
+</script>
+
 {% endblock body %}

@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    | Admin Login
+{% endblock title %}
+
+{% block body %}
+<style>
+.login-container {
+    max-width: 450px;
+    margin: 100px auto;
+    padding: 40px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    color: #ffffff;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.login-header .icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.login-header p {
+    color: #888;
+    font-size: 0.95rem;
+}
+
+.login-form {
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #ddd;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #eee;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #1159ac;
+    background: #333;
+    box-shadow: 0 0 0 3px rgba(17, 89, 172, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #666;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: #1159ac;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background: #357ab8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(17, 89, 172, 0.3);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.security-note {
+    margin-top: 25px;
+    padding: 15px;
+    background: #252525;
+    border-left: 3px solid #1159ac;
+    border-radius: 4px;
+}
+
+.security-note p {
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.security-note strong {
+    color: #1159ac;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-link a {
+    color: #1159ac;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.back-link a:hover {
+    color: #357ab8;
+    text-decoration: underline;
+}
+
+/* Alert Messages */
+.alert {
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.alert-error {
+    background: #2a1a1a;
+    border-left: 4px solid #ff4444;
+    color: #ffcccc;
+}
+
+.alert-success {
+    background: #1a2a1a;
+    border-left: 4px solid #4caf50;
+    color: #ccffcc;
+}
+
+.input-icon {
+    position: relative;
+}
+
+.input-icon input {
+    padding-left: 40px;
+}
+
+.input-icon::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+}
+
+.input-icon.password::before {
+    content: '';
+}
+</style>
+
+<div class="login-container">
+    <div class="login-header">
+        <div class="icon"></div>
+        <h1>Admin Login</h1>
+        <p>Access the Reports Management Dashboard</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" class="login-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="username">Username</label>
+            <div class="input-icon">
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required 
+                    autofocus>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-icon password">
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-login">
+             Login to Dashboard
+        </button>
+    </form>
+
+    <div class="security-note">
+        <p>
+            <strong>Security Notice:</strong> This area is restricted to authorized staff members only. 
+            Use your Django superuser credentials to access the reports management system.
+        </p>
+    </div>
+
+    <div class="back-link">
+        <a href="{% url 'home' %}">← Back to Home</a>
+    </div>
+</div>
+
+<script>
+// Add subtle animation on load
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.login-container');
+    container.style.opacity = '0';
+    container.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        container.style.transition = 'all 0.4s ease';
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+    }, 100);
+});
+
+// Add enter key support
+document.getElementById('password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.querySelector('.login-form').submit();
+    }
+});
+</script>
+
+{% endblock body %}

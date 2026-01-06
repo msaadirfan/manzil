@@ -1,6 +1,6 @@
 import heapq
 
-# Transfer penalty in kilometers (equivalent to ~5-10 minutes of travel time)
+#transfer penalty in kilometers(equivalent to 5-10 minutes of travel time)
 TRANSFER_PENALTY = 5.0
 
 def dijkstra(transit_map, route_info, source_node, target_node, debug=False):
@@ -22,7 +22,7 @@ def dijkstra(transit_map, route_info, source_node, target_node, debug=False):
         print(f"Transfer penalty: {TRANSFER_PENALTY} km")
     
     # Priority queue: (cost, counter, node, path, current_route)
-    # Start with NO route (None) so we can pick the best first route
+    # Start with NO route (none) so we can pick the best first route
     queue = [(0, 0, source_node, [{'station': source_node, 'route': None, 'is_transfer': False}], None)]
     
     # Track best cost to reach each (station, route) pair

@@ -1,188 +1,188 @@
-station_id,station_name
-1,Power House Chowrangi
-2,Abdullah Chowk
-3,Surjani KDA
-4,Karimi Chowrangi
-5,4K Chowrangi
-6,2 Mint Chowrangi
-7,Aisha Complex
-8,Erum Shopping
-9,Sakhi Hasan Chowrangi
-10,Five Star Chowrangi
-11,Hyderi Bus/Market
-12,KDA Chowrangi
-13,Board Office - Nazimabad
-14,Nazimabad No.7
-15,Nazimabad No.6
-16,Annu Bhai Park
-17,Model Park
-18,Nazimabad No.1
-19,Lasbela
-20,Guru Mandir
-21,Numaish Chowrangi 
-22,Mobile Market  
-23,Tibet Center
-24,Urdu Bazar
-25,Jama Cloth Market
-26,Civil Hospital
-27,City Court
-28,Bolton Market
-29,Tower
-30,Jinnah Bridge
-31,Keamari
-32,Jehangir Road
-33,Teen Hatti
-34,Daak Khana
-35,Liaquatabad-10
-36,Karimabad
-37,Ayesha Manzil
-38,Water Pump
-39,Sohrab Goth
-40,Shafiq Mor
-41,Nagan Chowrangi
-42,UP Mor
-43,Power House 
-44,Al Asif 
-45,New Sabzi Mandi
-46,Jamali Pull
-47,M9 Toll Plaza
-48,Dumba Goth
-49,Bahria Town 
-50,DHA City 
-51,Baqai University 
-52,Check Post 5 Malir Cantt
-53,Check Post 6 Malir Cantt
-54,Jinnah International Airport 
-55,Model Colony Mor
-56,Security Printing Press
-57,Malir Halt 
-58,CMH Malir 
-59,Tank Chowk
-60,Wireless Gate
-61,Chota Gate 
-62,Shah Faisal Colony Gate
-63,Natha Khan
-64,Drigh Road
-65,PAF Base Faisal
-66,Karsaz/Golf Club
-67,PAF Museum
-68,Awami Markaz
-69,Baloch Colony
-70,Fine House
-71,Lal Kothi
-72,Nursery
-73,FTC
-74,Kalapul
-75,NMC Hospital
-76,Sunset Boulevard
-77,Defence Morr
-78,Rahat Park
-79,Masjid-e-Ayesha
-80,26th Street
-81,Clock Tower DHA/Sea View
-82,Dolmen Mall/Clifton Beach 
-83,Ibrahim Hyderi
-84,PARCO
-85,Indus Hospital
-86,KPT Interchange
-87,Abdullah Shah Ghazi
-88,Do Talwar
-89,Teen Talwar
-90,Frere Hall
-91,Metropole 
-92,Mazar-e-Quaid 
-93,Dawood University
-94,Jail Chowrangi
-95,Aga Khan Hospital
-96,National Stadium
-97,Millennium Mall
-98,Johar Mor
-99,Johar Chowrangi
-100,Kamran Chowrangi
-101,Mausamiyat
-102,Safoora 
-103,Hawks Bay 
-104,Mauripur
-105,Masroor Base
-106,Gulbai
-107,Agra Taj Colony
-108,Daryabad 
-109,Sher Shah 
-110,Baldia
-111,Naval Colony
-112,Yousuf Goth 
-113,Dockyard 
-114,I.I.Chundrigar
-115,City Railway
-116,Shaheen Complex
-117,Art Council
-118,Regent Plaza
-119,Aisha Bawani College
-120,Kalaboard
-121,RCD Ground
-122,Saudabad Chowrangi
-123,Khokhrapar
-124,Naddi Kinara 
-125,Malir 15
-126,Malir Session Court
-127,Nadra Center - Malir
-128,Murghikhana
-129,Quaidabad
-130,Dawood Chowrangi
-131,Babar Market
-132,Sector 36 Landhi
-133,Sector 35 Landhi
-134,Sector 33 Korangi
-135,Sector 32 Landhi
-136,Gulzar Colony 
-137,Nasir Jump
-138,Korangi terminal R2-R12
-139,Jut Land
-140,Lines Area
-141,Lucky Star Saddar 
-142,Miran Nakka Lyari 
-143,Gulistan Colony
-144,Bihar Colony
-145,Bahria Complex 3-M.T.Khan Rd
-146,M.T. Khan Road
-147,PIDC
-148,Submarine Chowk
-149,Bahria Complex 4
-150,Khadda Market
-151,Bilawal Chowrangi
-152,Ziauddin Hospital
-153,Shireen Jinnah Colony 
-154,Nadra Center - North Nazimabad 
-155,Police Station
-156,Abdullah College
-157,Eidgah Nazimabad 
-158,Essa Nagri
-159,Hasan Square
-160,Maritime Museum
-161,KDA Scheme 1
-162,Imtiaz Mega-Qayyumabad
-163,Brooks Chowrangi
-164,Soorty Factory
-165,Shan Chowrangi 
-166,Lucky One Mall 
-167,Imtiaz Mega Store - Gulshan-e-Iqbal 
-168,Gulshan Chowrangi
-169,NIPA
-170,Aladin Park
-171,Army Public School-Rashid Minhas Rd
-172,Shama Shopping Center
-173,Shah Faisal Colony 2
-174,Singer Chowrangi
-175,Khaddi Stop
-176,District Court Korangi 
-177,Gulshan e Hadeed 
-178,Salahuddin Ayubi Road
-179,National Highway 5
-180,Steel Mill Mor
-181,Port Qasim
-182,Razzakabad
-183,Abdullah Goth
-184,Chowkundi Mor
-185,FAST University
-186,Bhains Colony Mor
-187,Manzil Pump 
+station_id,station_name,lat,lng
+1,Power House Chowrangi,24.983889,67.066111
+2,Abdullah Chowk,24.97,67.066667
+3,Surjani KDA,24.967778,67.066667
+4,Karimi Chowrangi,24.967222,67.066667
+5,4K Chowrangi,24.966111,67.066667
+6,2 Mint Chowrangi,24.965278,67.066667
+7,Aisha Complex,24.964722,67.066667
+8,Erum Shopping,24.960556,67.063611
+9,Sakhi Hasan Chowrangi,24.953889,67.0575
+10,Five Star Chowrangi,24.945833,67.050278
+11,Hyderi Bus/Market,24.9375,67.043056
+12,KDA Chowrangi,24.931111,67.0375
+13,Board Office - Nazimabad,24.925,67.031944
+14,Nazimabad No.7,24.918333,67.031111
+15,Nazimabad No.6,24.9175,67.031111
+16,Annu Bhai Park,24.916944,67.031111
+17,Model Park,24.910556,67.031389
+18,Nazimabad No.1,24.910278,67.035278
+19,Lasbela,24.91,67.038056
+20,Guru Mandir,24.909722,67.0425
+21,Numaish Chowrangi,24.909167,67.049722
+22,Mobile Market,24.865,67.024722
+23,Tibet Center,24.862778,67.021389
+24,Urdu Bazar,24.86,67.016389
+25,Jama Cloth Market,24.858333,67.013889
+26,Civil Hospital,24.858056,67.013333
+27,City Court,24.854167,67.006389
+28,Bolton Market,24.851111,67.000556
+29,Tower,24.847778,66.995
+30,Jinnah Bridge,24.845833,66.992778
+31,Keamari,24.818056,66.975
+32,Jehangir Road,24.886944,67.041389
+33,Teen Hatti,24.892778,67.043611
+34,Daak Khana,24.907222,67.048611
+35,Liaquatabad-10,24.909167,67.049722
+36,Karimabad,24.918611,67.053611
+37,Ayesha Manzil,24.927222,67.064167
+38,Water Pump,24.9375,67.076667
+39,Sohrab Goth,24.943611,67.084167
+40,Shafiq Mor,24.9575,67.075556
+41,Nagan Chowrangi,24.964444,67.066944
+42,UP Mor,24.9725,67.066667
+43,Power House,24.985278,67.065556
+44,Al Asif,24.953056,67.095278
+45,New Sabzi Mandi,24.993611,67.153611
+46,Jamali Pull,24.989722,67.179167
+47,M9 Toll Plaza,24.9825,67.227778
+48,Dumba Goth,24.975833,67.268056
+49,Bahria Town,24.992778,67.318056
+50,DHA City,25.038056,67.446111
+51,Baqai University,24.987222,67.196111
+52,Check Post 5 Malir Cantt,24.947778,67.1825
+53,Check Post 6 Malir Cantt,24.9275,67.179167
+54,Jinnah International Airport,24.8975,67.179444
+55,Model Colony Mor,24.903333,67.181667
+56,Security Printing Press,24.893056,67.178056
+57,Malir Halt,24.884167,67.176944
+58,CMH Malir,24.948889,67.214167
+59,Tank Chowk,24.931111,67.204167
+60,Wireless Gate,24.885556,67.167778
+61,Chota Gate,24.886944,67.161667
+62,Shah Faisal Colony Gate,24.886944,67.150278
+63,Natha Khan,24.886944,67.135
+64,Drigh Road,24.886944,67.125278
+65,PAF Base Faisal,24.882778,67.113056
+66,Karsaz/Golf Club,24.876389,67.101667
+67,PAF Museum,24.873889,67.094167
+68,Awami Markaz,24.871111,67.089444
+69,Baloch Colony,24.867222,67.082778
+70,Fine House,24.865278,67.078056
+71,Lal Kothi,24.861944,67.069167
+72,Nursery,24.859722,67.058889
+73,FTC,24.858611,67.05
+74,Kalapul,24.850833,67.053056
+75,NMC Hospital,24.846389,67.055
+76,Sunset Boulevard,24.836667,67.067778
+77,Defence Morr,24.833611,67.073333
+78,Rahat Park,24.815278,67.075833
+79,Masjid-e-Ayesha,24.802222,67.077222
+80,26th Street,24.787222,67.062778
+81,Clock Tower DHA/Sea View,24.778611,67.054444
+82,Dolmen Mall/Clifton Beach,24.802778,67.030278
+83,Ibrahim Hyderi,24.794444,67.136111
+84,PARCO,24.801667,67.133056
+85,Indus Hospital,24.816944,67.107778
+86,KPT Interchange,24.830278,67.079722
+87,Abdullah Shah Ghazi,24.810833,67.030833
+88,Do Talwar,24.821111,67.033611
+89,Teen Talwar,24.833611,67.033333
+90,Frere Hall,24.847222,67.031111
+91,Metropole,24.850833,67.029722
+92,Mazar-e-Quaid,24.875278,67.036944
+93,Dawood University,24.879167,67.046944
+94,Jail Chowrangi,24.884722,67.056667
+95,Aga Khan Hospital,24.890556,67.074722
+96,National Stadium,24.892222,67.082222
+97,Millennium Mall,24.900833,67.115278
+98,Johar Mor,24.904722,67.113056
+99,Johar Chowrangi,24.916389,67.130278
+100,Kamran Chowrangi,24.923611,67.1375
+101,Mausamiyat,24.935833,67.138889
+102,Safoora,24.939167,67.156111
+103,Hawks Bay,24.863056,66.849444
+104,Mauripur,24.868333,66.918056
+105,Masroor Base,24.877222,66.964444
+106,Gulbai,24.875556,66.9675
+107,Agra Taj Colony,24.870556,66.976667
+108,Daryabad,24.861667,66.986667
+109,Sher Shah,24.889167,66.982222
+110,Baldia,24.935278,66.938333
+111,Naval Colony,24.946389,66.931667
+112,Yousuf Goth,24.958333,66.923889
+113,Dockyard,24.830556,66.970833
+114,I.I.Chundrigar,24.848611,66.9975
+115,City Railway,24.850278,67.012222
+116,Shaheen Complex,24.851111,67.019444
+117,Art Council,24.853056,67.021667
+118,Regent Plaza,24.855278,67.037778
+119,Aisha Bawani College,24.857222,67.047222
+120,Kalaboard,24.888333,67.186111
+121,RCD Ground,24.900278,67.195556
+122,Saudabad Chowrangi,24.900833,67.201389
+123,Khokhrapar,24.910278,67.219167
+124,Naddi Kinara,24.913333,67.245833
+125,Malir 15,24.878611,67.188333
+126,Malir Session Court,24.873889,67.194722
+127,Nadra Center - Malir,24.871389,67.197778
+128,Murghikhana,24.86,67.2075
+129,Quaidabad,24.855278,67.211389
+130,Dawood Chowrangi,24.850278,67.206944
+131,Babar Market,24.840556,67.191667
+132,Sector 36 Landhi,24.839444,67.183889
+133,Sector 35 Landhi,24.828056,67.161389
+134,Sector 33 Korangi,24.823333,67.14
+135,Sector 32 Landhi,24.822222,67.133889
+136,Gulzar Colony,24.821111,67.129722
+137,Nasir Jump,24.820278,67.125278
+138,Korangi terminal R2-R12,24.818889,67.117222
+139,Jut Land,24.860833,67.040833
+140,Lines Area,24.859722,67.036944
+141,Lucky Star Saddar,24.856944,67.033333
+142,Miran Nakka Lyari,24.879167,66.995556
+143,Gulistan Colony,24.876389,66.988056
+144,Bihar Colony,24.875,66.985
+145,Bahria Complex 3-M.T.Khan Rd,24.844167,67.003056
+146,M.T. Khan Road,24.845,66.997778
+147,PIDC,24.846389,67.024167
+148,Submarine Chowk,24.828056,67.042222
+149,Bahria Complex 4,24.824444,67.044167
+150,Khadda Market,24.813333,67.047778
+151,Bilawal Chowrangi,24.815556,67.02
+152,Ziauddin Hospital,24.816667,67.0075
+153,Shireen Jinnah Colony,24.816944,67.005556
+154,Nadra Center - North Nazimabad,24.946389,67.050833
+155,Police Station,24.936389,67.041667
+156,Abdullah College,24.924722,67.031667
+157,Eidgah Nazimabad,24.911111,67.030833
+158,Essa Nagri,24.903889,67.068056
+159,Hasan Square,24.901667,67.071667
+160,Maritime Museum,24.885278,67.089167
+161,KDA Scheme 1,24.881389,67.091667
+162,Imtiaz Mega-Qayyumabad,24.830833,67.080278
+163,Brooks Chowrangi,24.834444,67.099444
+164,Soorty Factory,24.837778,67.116389
+165,Shan Chowrangi,24.838611,67.120556
+166,Lucky One Mall,24.932222,67.085833
+167,Imtiaz Mega Store - Gulshan-e-Iqbal,24.928333,67.088056
+168,Gulshan Chowrangi,24.921667,67.093889
+169,NIPA,24.9175,67.096944
+170,Aladin Park,24.910833,67.105833
+171,Army Public School-Rashid Minhas Rd,24.891667,67.121944
+172,Shama Shopping Center,24.884722,67.145556
+173,Shah Faisal Colony 2,24.883611,67.149444
+174,Singer Chowrangi,24.886944,67.150556
+175,Khaddi Stop,24.849722,67.159167
+176,District Court Korangi,24.818611,67.117778
+177,Gulshan e Hadeed,24.870833,67.371944
+178,Salahuddin Ayubi Road,24.864444,67.35
+179,National Highway 5,24.861389,67.350833
+180,Steel Mill Mor,24.861389,67.324722
+181,Port Qasim,24.864444,67.311944
+182,Razzakabad,24.864167,67.2925
+183,Abdullah Goth,24.862222,67.284167
+184,Chowkundi Mor,24.859444,67.2725
+185,FAST University,24.8575,67.264444
+186,Bhains Colony Mor,24.855833,67.258056
+187,Manzil Pump,24.854722,67.228889

@@ -11,9 +11,9 @@ def normalize(name: str) -> str:
 def transit_map(debug=False):
     """
     Builds a graph where:
-    - graph[station][neighbor] = distance
-    - route_info[station][neighbor] = LIST of all routes connecting them
-    - routes_per_station[station] = set of all routes serving that station
+    graph[station][neighbor] = distance
+    route_info[station][neighbor] = LIST of all routes connecting them
+    routes_per_station[station] = set of all routes serving that station
     """
     graph = defaultdict(dict)
     route_info = defaultdict(lambda: defaultdict(list))  # Now stores LISTS of routes
@@ -36,11 +36,11 @@ def transit_map(debug=False):
         distance = float(route.distance_kms)
         route_id = route.route_id
         
-        # Store the edge (bidirectional)
+        # Store the edge
         graph[from_name][to_name] = distance
         graph[to_name][from_name] = distance
         
-        # Store ALL routes for this edge (not just one)
+        # Store ALL routes for this edge
         if route_id not in route_info[from_name][to_name]:
             route_info[from_name][to_name].append(route_id)
         if route_id not in route_info[to_name][from_name]:
@@ -93,7 +93,7 @@ def validate_graph_connectivity(graph):
     return issues
 
 def diagnose_graph_issues():
-    print("=== GRAPH DIAGNOSIS ===")
+    print("GRAPH DIAGNOSIS")
     
     station_count = Station.objects.count()
     route_count = Route.objects.count()

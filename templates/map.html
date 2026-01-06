@@ -1,38 +1,411 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}
-    | Map 
-{% endblock title %}
+{% block title %}| Interactive Map{% endblock %}
 
 {% block body %}
+<style>
+    #map {
+        width: 100%;
+        height: calc(100vh - 150px);
+        min-height: 500px;
+    }
 
-<div id="map-container" style="width:100%; height:80vh;touch-action: none;  overflow:hidden;">
-    <img id="map-image" src="{% static 'images/karachi_metro_map.png' %}" alt="Karachi Bus Route Map" style="width:100%; height:auto; display:block; padding-top: 20px;"/>
+    .station-label {
+        background: white;
+        border: 1px solid #333;
+        padding: 2px 4px;
+        font-size: 11px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2000;
+        background: white;
+        padding: 20px 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .loading.hidden {
+        display: none;
+    }
+
+    .map-legend {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        z-index: 1000;
+        max-height: 80vh;
+        overflow-y: auto;
+        min-width: 250px;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .map-legend::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .map-legend::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .map-legend::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    .map-legend::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .map-legend h4 {
+        margin: 0 0 18px 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: white;
+        border: 1px solid transparent;
+    }
+
+    .legend-item:hover {
+        background: #f8f9fa;
+        transform: translateX(-3px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    .legend-color-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .legend-color-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 100%);
+    }
+
+    .legend-color {
+        width: 100%;
+        height: 100%;
+        border-radius: 6px;
+    }
+
+    .legend-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .legend-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .legend-sublabel {
+        font-size: 11px;
+        color: #6c757d;
+        font-weight: 400;
+    }
+
+    .legend-toggle {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 2px solid #dee2e6;
+        background: white;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .legend-toggle.active {
+        background: #28a745;
+        border-color: #28a745;
+    }
+
+    .legend-toggle.active::after {
+        content: '✓';
+        position: absolute;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .route-stats {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid #e9ecef;
+        font-size: 12px;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .map-legend {
+            right: 10px;
+            left: 10px;
+            top: auto;
+            bottom: 10px;
+            transform: none;
+            max-height: 40vh;
+            min-width: auto;
+        }
+    }
+</style>
+
+<div class="loading" id="loading">
+    <p>Loading map data...</p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
-<script>
-    const element = document.getElementById('map-image');
-    const panzoom = Panzoom(element, {
-        maxScale: 5,
-        minScale: 1,
-        contain: 'outside',
-        cursor: 'move'
-    });
+<div id="map"></div>
 
-    element.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
-    element.parentElement.addEventListener('pointerdown', function(e) {
-        panzoom.handleDown(e);
-    });
-    element.parentElement.addEventListener('pointermove', function(e) {
-        panzoom.handleMove(e);
-    });
-    element.parentElement.addEventListener('pointerup', function(e) {
-        panzoom.handleUp(e);
-    });
-    element.parentElement.addEventListener('pointerleave', function(e) {
-        panzoom.handleUp(e);
-    });
+<div class="map-legend">
+    <h4>🚇 Routes</h4>
+    <div id="legendContent"></div>
+</div>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // Route colors
+    const routeColors = {
+        "EV1": "#0066CC",
+        "EV2": "#00AA00",
+        "EV3": "#FF1493",
+        "EV4": "#8B008B",
+        "EV5": "#FF6600",
+        "R1": "#FFD700",
+        "R2": "#8B4513",
+        "R3": "#32CD32",
+        "R4": "#1E90FF",
+        "R8": "#FF69B4",
+        "R9": "#4169E1",
+        "R10": "#FF4500",
+        "R11": "#9370DB",
+        "R12": "#20B2AA",
+        "R13": "#DC143C",
+        "OL": "#FFA500",
+        "GL": "#228B22"
+    };
+
+    const routeNames = {
+        "EV1": { name: "EV1 - Malir Cantt to Dolmen", short: "EV-BUS" },
+        "EV2": { name: "EV2 - Bahria Town to Malir", short: "EV-BUS" },
+        "EV3": { name: "EV3 - Malir to Numaish", short: "EV-BUS" },
+        "EV4": { name: "EV4 - Bahria to Ayesha Manzil", short: "EV-BUS" },
+        "EV5": { name: "EV5 - DHA City to Sohrab Goth", short: "EV-BUS" },
+        "R1": { name: "R1 - Khokhrapar to Dockyard", short: "Red Line" },
+        "R2": { name: "R2 - Power House to Indus", short: "Red Line" },
+        "R3": { name: "R3 - Power House to Nasir Jump", short: "Red Line" },
+        "R4": { name: "R4 - Power House to Keamari", short: "Red Line" },
+        "R8": { name: "R8 - Tower to Yousuf Goth", short: "Red Line" },
+        "R9": { name: "R9 - Gulshan e Hadeed to Tower", short: "Red Line" },
+        "R10": { name: "R10 - Numaish to Ibrahim Hyderi", short: "Red Line" },
+        "R11": { name: "R11 - Miran Nakka to Shireen Jinnah", short: "Red Line" },
+        "R12": { name: "R12 - Naddi Kinara to Indus", short: "Red Line" },
+        "R13": { name: "R13 - Tower to Hawks Bay", short: "Red Line" },
+        "OL": { name: "Orange Line", short: "Orange" },
+        "GL": { name: "Green Line - Power House to Guru Mandir", short: "Green" }
+    };
+
+    // Initialize map
+    const map = L.map("map").setView([24.8607, 67.0011], 12);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors",
+        maxZoom: 18
+    }).addTo(map);
+
+    // Store route layers for toggling
+    const routeLayerGroups = {};
+
+    // Load and display data
+    async function initializeMap() {
+        const loading = document.getElementById('loading');
+        loading.classList.remove('hidden');
+
+        try {
+            // Fetch data from Django APIs
+            const [stationsRes, routesRes] = await Promise.all([
+                fetch('/api/stations/'),
+                fetch('/api/routes/')
+            ]);
+
+            const stations = await stationsRes.json();
+            const routes = await routesRes.json();
+
+            console.log(`Loaded ${stations.length} stations and ${routes.length} route segments`);
+
+            // Create station map for quick lookup
+            const stationMap = {};
+            stations.forEach(s => {
+                stationMap[s.station_id] = [s.lat, s.lng];
+            });
+
+            // Draw stations
+            stations.forEach(s => {
+                const marker = L.circleMarker([s.lat, s.lng], {
+                    radius: 6,
+                    color: "#333",
+                    fillColor: "#ffffff",
+                    fillOpacity: 1,
+                    weight: 2
+                }).addTo(map);
+
+                marker.bindPopup(`<strong>${s.station_name}</strong>`);
+
+                // Add hover effect
+                marker.on('mouseover', function() {
+                    this.setStyle({ radius: 8, weight: 3 });
+                });
+                marker.on('mouseout', function() {
+                    this.setStyle({ radius: 6, weight: 2 });
+                });
+            });
+
+            // Group routes by route_id
+            const routeGroups = {};
+            routes.forEach(r => {
+                if (!routeGroups[r.route_id]) {
+                    routeGroups[r.route_id] = [];
+                }
+                routeGroups[r.route_id].push([
+                    [r.from_lat, r.from_lng],
+                    [r.to_lat, r.to_lng]
+                ]);
+            });
+
+            // Draw routes
+            Object.keys(routeGroups).forEach(routeId => {
+                const color = routeColors[routeId] || "#666666";
+                
+                // Create a layer group for this route
+                const layerGroup = L.layerGroup();
+                
+                routeGroups[routeId].forEach(segment => {
+                    const line = L.polyline(segment, {
+                        color: color,
+                        weight: 5,
+                        opacity: 0.7
+                    });
+                    layerGroup.addLayer(line);
+                });
+                
+                // Add to map and store reference
+                layerGroup.addTo(map);
+                routeLayerGroups[routeId] = layerGroup;
+            });
+
+            // Create legend with toggle functionality
+            const legendContent = document.getElementById('legendContent');
+            let totalStations = stations.length;
+            let totalRoutes = Object.keys(routeGroups).length;
+            
+            Object.keys(routeGroups).forEach(routeId => {
+                const routeInfo = routeNames[routeId];
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.setAttribute('data-route', routeId);
+                
+                item.innerHTML = `
+                    <div class="legend-color-box" style="background: ${routeColors[routeId] || '#666'}">
+                        <div class="legend-color"></div>
+                    </div>
+                    <div class="legend-details">
+                        <span class="legend-label">${routeId}</span>
+                        <span class="legend-sublabel">${routeInfo ? routeInfo.short : 'Route'}</span>
+                    </div>
+                    <div class="legend-toggle active"></div>
+                `;
+                
+                // Toggle route visibility on click
+                item.addEventListener('click', function() {
+                    const toggle = this.querySelector('.legend-toggle');
+                    const isActive = toggle.classList.contains('active');
+                    
+                    if (isActive) {
+                        // Hide route
+                        map.removeLayer(routeLayerGroups[routeId]);
+                        toggle.classList.remove('active');
+                        this.style.opacity = '0.5';
+                    } else {
+                        // Show route
+                        routeLayerGroups[routeId].addTo(map);
+                        toggle.classList.add('active');
+                        this.style.opacity = '1';
+                    }
+                });
+                
+                legendContent.appendChild(item);
+            });
+            
+            // Add stats at the bottom
+            const stats = document.createElement('div');
+            stats.className = 'route-stats';
+            stats.innerHTML = `
+                <strong>${totalStations}</strong> Stations • <strong>${totalRoutes}</strong> Routes
+            `;
+            legendContent.appendChild(stats);
+
+        } catch (error) {
+            console.error('Error loading map:', error);
+            alert('Error loading map data. Check console for details.');
+        } finally {
+            loading.classList.add('hidden');
+        }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', initializeMap);
 </script>
-{% endblock body %}
+
+{% endblock %}
