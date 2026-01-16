@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: manzil-app
+    env: python
+    region: singapore  # or your preferred region
+    plan: free
+    branch: main  # or your git branch name
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn manzilproject.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: manzilproject.settings_production
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false  # Set manually after deployment
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false  # Set manually after deployment

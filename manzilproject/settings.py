@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
 import os
 from django.contrib.messages import constants as messages
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,13 +25,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ia@n!7oct+!%ifc0@#@_#734f$$&!jx6=qhg)6_rnvfosrz(&g'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+# Load the .env file
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 # Application definition
 
@@ -75,19 +82,31 @@ WSGI_APPLICATION = 'manzilproject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'manzil_db',
-        'USER': 'msaadirfan',
-        'PASSWORD': 'Saadpmc9.',
-        'HOST': 'localhost',
-        'PORT': '5432',
+if DATABASE_URL:
+    # Check if it's a local database or cloud database
+    is_local = 'localhost' in DATABASE_URL or '127.0.0.1' in DATABASE_URL
+    is_pooler = 'pooler.supabase.com' in DATABASE_URL
+    
+    db_config = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=not is_local
+        )
     }
-}
-
-
+    
+    # Add pgbouncer settings for pooler
+    if is_pooler:
+        db_config['default']['OPTIONS'] = {
+            'sslmode': 'require',
+        }
+        # Disable server-side cursors for pgbouncer compatibility
+        db_config['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+    
+    DATABASES = db_config
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
