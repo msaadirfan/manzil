@@ -9,12 +9,7 @@ def normalize(name: str) -> str:
     return " ".join(name.strip().split()).title()
 
 def transit_map(debug=False):
-    """
-    Builds a graph where:
-    graph[station][neighbor] = distance
-    route_info[station][neighbor] = LIST of all routes connecting them
-    routes_per_station[station] = set of all routes serving that station
-    """
+    
     graph = defaultdict(dict)
     route_info = defaultdict(lambda: defaultdict(list))  # Now stores LISTS of routes
     routes_per_station = defaultdict(set)
