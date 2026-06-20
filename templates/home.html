@@ -234,6 +234,9 @@
     function closeMapPicker() {
         document.getElementById('mapPickerModal').style.display = 'none';
     }
+    // Store confirmed map selections in JS variables (immune to DOM resets)
+    let confirmedFrom = null;  // {lat, lng} or null
+    let confirmedTo = null;
 
     function confirmMapSelection() {
         if (!selectedLatLng) {
@@ -241,57 +244,55 @@
             return;
         }
 
-        const latInput = document.getElementById(`${currentPickerTarget}_lat`);
-        const lngInput = document.getElementById(`${currentPickerTarget}_lng`);
-        const typeInput = document.getElementById(`${currentPickerTarget}_type`);
-        const textInput = document.getElementById(`${currentPickerTarget}Station`);
-
-        // Store coordinates before closing
         const savedLat = selectedLatLng.lat;
         const savedLng = selectedLatLng.lng;
+        const target = currentPickerTarget;
 
-        latInput.value = savedLat;
-        lngInput.value = savedLng;
-        typeInput.value = "coordinate";
+        // Store in JS variable immediately
+        if (target === 'from') {
+            confirmedFrom = { lat: savedLat, lng: savedLng };
+        } else {
+            confirmedTo = { lat: savedLat, lng: savedLng };
+        }
 
         closeMapPicker();
 
-        // Reverse geocode for display name only
-        // Use a flag to prevent the input event listener from clearing our values
+        // Show a temporary placeholder while reverse geocoding
+        const textInput = document.getElementById(`${target}Station`);
+        textInput.value = `📍 Pin (${savedLat.toFixed(4)}, ${savedLng.toFixed(4)})`;
+
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${savedLat}&lon=${savedLng}`)
             .then(res => res.json())
             .then(data => {
-                const name = data.name || data.display_name.split(',').slice(0, 2).join(',')
-                    || `Pin (${savedLat.toFixed(4)}, ${savedLng.toFixed(4)})`;
-
-                // Set value WITHOUT triggering input event
-                textInput.removeEventListener("input", textInput._inputHandler);
+                const name = (data.name || data.display_name.split(',').slice(0, 2).join(','));
                 textInput.value = name;
-
-                // Re-affirm coordinate values after setting text
-                latInput.value = savedLat;
-                lngInput.value = savedLng;
-                typeInput.value = "coordinate";
             })
-            .catch(() => {
-                textInput.value = `Pin (${savedLat.toFixed(4)}, ${savedLng.toFixed(4)})`;
-                latInput.value = savedLat;
-                lngInput.value = savedLng;
-                typeInput.value = "coordinate";
-            });
+            .catch(() => { });
     }
 
     function submitRouteForm() {
-        // If coordinates are missing but text exists, default to station search
         const form = document.getElementById('routeForm');
-        if (!document.getElementById('from_lat').value) {
+
+        // Inject confirmed coordinates from JS variables into hidden fields
+        if (confirmedFrom) {
+            document.getElementById('from_lat').value = confirmedFrom.lat;
+            document.getElementById('from_lng').value = confirmedFrom.lng;
+            document.getElementById('from_type').value = 'coordinate';
+        } else {
             document.getElementById('from_type').value = 'station';
         }
-        if (!document.getElementById('to_lat').value) {
+
+        if (confirmedTo) {
+            document.getElementById('to_lat').value = confirmedTo.lat;
+            document.getElementById('to_lng').value = confirmedTo.lng;
+            document.getElementById('to_type').value = 'coordinate';
+        } else {
             document.getElementById('to_type').value = 'station';
         }
+
         form.submit();
     }
+
 </script>
 
 {% endblock body %}
