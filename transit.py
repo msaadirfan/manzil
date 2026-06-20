@@ -3,14 +3,28 @@ from routefinder.models import Station
 from routefinder.models import Route
 from dijkstras import get_connected_component
 
-def normalize(name: str) -> str: 
+import re
+
+def normalize(name: str) -> str:
     if not name:
         return ""
-    # Use title case but fix number suffixes like 26th, 1st, 2nd, 3rd
-    result = " ".join(name.strip().split()).title()
-    # Fix ordinal suffixes that .title() incorrectly capitalizes
-    import re
+    # Collapse whitespace
+    name = " ".join(name.strip().split())
+    # Title case each word, but split on spaces only (not slashes/hyphens)
+    # so "DHA/Sea" doesn't get mangled
+    def title_word(w):
+        # Split on slash, title each part, rejoin
+        parts = w.split('/')
+        titled = []
+        for p in parts:
+            titled.append(p.capitalize())
+        return '/'.join(titled)
+    
+    result = ' '.join(title_word(w) for w in name.split())
+    
+    # Fix ordinal suffixes: 26Th -> 26th, 1St -> 1st etc.
     result = re.sub(r'(\d+)(St|Nd|Rd|Th)\b', lambda m: m.group(1) + m.group(2).lower(), result)
+    
     return result
 
 def transit_map(debug=False):
