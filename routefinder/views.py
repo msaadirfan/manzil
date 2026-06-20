@@ -461,3 +461,15 @@ def api_routes(request):
 def map_view(request):
     """Render the map page"""
     return render(request, 'map.html')
+
+def debug_station(request):
+    from transit import transit_map, normalize
+    graph, _, _ = transit_map()
+    test = normalize("Clock Tower DHA/Sea View")
+    in_graph = test in graph
+    clock_stations = [k for k in graph.keys() if 'Clock' in k]
+    return JsonResponse({
+        'normalized': test,
+        'in_graph': in_graph,
+        'clock_stations': clock_stations
+    })
