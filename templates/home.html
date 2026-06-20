@@ -1,30 +1,34 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}
-    | Home
+| Home
 {% endblock title %}
 
 {% block body %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="hero-section">
     <div class="hero-overlay">
         <div class="hero-content">
             <h1>Navigate Karachi<br>The Smart Way</h1>
-            <p>Find the fastest and most reliable transit routes across the City of Lights. Powered by real route data and smart algorithms.</p>
+            <p>Find the fastest and most reliable transit routes across the City of Lights. Powered by real route data
+                and smart algorithms.</p>
         </div>
     </div>
 </div>
+
 
 <div class="route-finder-section">
     <h2>Route Finder</h2>
     <form method="post" action="/find_route" class="route-form" id="routeForm">
         {% csrf_token %}
-        
+
         <!-- Hidden fields to store exact coordinates -->
         <input type="hidden" id="from_lat" name="from_lat">
         <input type="hidden" id="from_lng" name="from_lng">
         <input type="hidden" id="from_type" name="from_type" value="station">
-        
+
         <input type="hidden" id="to_lat" name="to_lat">
         <input type="hidden" id="to_lng" name="to_lng">
         <input type="hidden" id="to_type" name="to_type" value="station">
@@ -32,8 +36,10 @@
         <div class="form-group">
             <label for="fromStation">From</label>
             <div class="input-with-btn">
-                <input type="text" id="fromStation" name="fromStation" placeholder="Enter starting address or station..." autocomplete="off">
-                <button type="button" class="btn-map-picker" onclick="openMapPicker('from')" title="Choose on Map">Map</button>
+                <input type="text" id="fromStation" name="fromStation"
+                    placeholder="Enter starting address or station..." autocomplete="off">
+                <button type="button" class="btn-map-picker" onclick="openMapPicker('from')"
+                    title="Choose on Map">Map</button>
             </div>
             <ul id="fromSuggestions" class="suggestions-list"></ul>
         </div>
@@ -41,8 +47,10 @@
         <div class="form-group">
             <label for="toStation">To</label>
             <div class="input-with-btn">
-                <input type="text" id="toStation" name="toStation" placeholder="Enter destination address or station..." autocomplete="off">
-                <button type="button" class="btn-map-picker" onclick="openMapPicker('to')" title="Choose on Map">Map</button>
+                <input type="text" id="toStation" name="toStation" placeholder="Enter destination address or station..."
+                    autocomplete="off">
+                <button type="button" class="btn-map-picker" onclick="openMapPicker('to')"
+                    title="Choose on Map">Map</button>
             </div>
             <ul id="toSuggestions" class="suggestions-list"></ul>
         </div>
@@ -72,204 +80,204 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-let debounceTimer;
-let allStationsCache = null;
+    let debounceTimer;
+    let allStationsCache = null;
 
-// Pre-fetch all stations to provide fast local autocomplete
-async function fetchAllStations() {
-    try {
-        const response = await fetch('/api/stations/');
-        allStationsCache = await response.json();
-    } catch(e) {
-        console.error("Failed to fetch stations cache");
-    }
-}
-fetchAllStations();
-
-function setupAutocomplete(inputId, suggestionId, typeId, latId, lngId) {
-    const input = document.getElementById(inputId);
-    const suggestions = document.getElementById(suggestionId);
-    const typeInput = document.getElementById(typeId);
-    const latInput = document.getElementById(latId);
-    const lngInput = document.getElementById(lngId);
-
-    // Clear hidden inputs when user types manually (until they select a suggestion)
-    input.addEventListener("input", () => {
-        typeInput.value = "station";
-        latInput.value = "";
-        lngInput.value = "";
-        
-        clearTimeout(debounceTimer);
-        const query = input.value.trim().toLowerCase();
-        
-        if (!query) {
-            suggestions.innerHTML = "";
-            return;
+    // Pre-fetch all stations to provide fast local autocomplete
+    async function fetchAllStations() {
+        try {
+            const response = await fetch('/api/stations/');
+            allStationsCache = await response.json();
+        } catch (e) {
+            console.error("Failed to fetch stations cache");
         }
+    }
+    fetchAllStations();
 
-        debounceTimer = setTimeout(async () => {
-            suggestions.innerHTML = "";
-            let resultsCount = 0;
+    function setupAutocomplete(inputId, suggestionId, typeId, latId, lngId) {
+        const input = document.getElementById(inputId);
+        const suggestions = document.getElementById(suggestionId);
+        const typeInput = document.getElementById(typeId);
+        const latInput = document.getElementById(latId);
+        const lngInput = document.getElementById(lngId);
 
-            // 1. Search Local Stations first
-            if (allStationsCache) {
-                const matchedStations = allStationsCache.filter(s => s.station_name.toLowerCase().includes(query)).slice(0, 4);
-                
-                if (matchedStations.length > 0) {
-                    const header = document.createElement("li");
-                    header.className = "suggestion-header";
-                    header.textContent = "Transit Stations";
-                    suggestions.appendChild(header);
+        // Clear hidden inputs when user types manually (until they select a suggestion)
+        input.addEventListener("input", () => {
+            typeInput.value = "station";
+            latInput.value = "";
+            lngInput.value = "";
 
-                    matchedStations.forEach(station => {
-                        const li = document.createElement("li");
-                        li.textContent = station.station_name;
-                        li.className = "suggestion-item";
-                        li.addEventListener("click", () => {
-                            input.value = station.station_name;
-                            typeInput.value = "station";
-                            latInput.value = station.lat;
-                            lngInput.value = station.lng;
-                            suggestions.innerHTML = "";
-                        });
-                        suggestions.appendChild(li);
-                        resultsCount++;
-                    });
-                }
+            clearTimeout(debounceTimer);
+            const query = input.value.trim().toLowerCase();
+
+            if (!query) {
+                suggestions.innerHTML = "";
+                return;
             }
 
-            // 2. Search OpenStreetMap (Nominatim) for addresses
-            if (query.length >= 3) {
-                try {
-                    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&city=Karachi&limit=4`);
-                    const places = await response.json();
+            debounceTimer = setTimeout(async () => {
+                suggestions.innerHTML = "";
+                let resultsCount = 0;
 
-                    if (places.length > 0) {
+                // 1. Search Local Stations first
+                if (allStationsCache) {
+                    const matchedStations = allStationsCache.filter(s => s.station_name.toLowerCase().includes(query)).slice(0, 4);
+
+                    if (matchedStations.length > 0) {
                         const header = document.createElement("li");
                         header.className = "suggestion-header";
-                        header.textContent = "Places & Addresses";
+                        header.textContent = "Transit Stations";
                         suggestions.appendChild(header);
 
-                        places.forEach(place => {
+                        matchedStations.forEach(station => {
                             const li = document.createElement("li");
-                            const displayName = place.display_name.split(',').slice(0, 2).join(','); // keep it short
-                            li.innerHTML = `<strong>${place.name || displayName}</strong><br><small class="text-muted">${displayName}</small>`;
-                            li.className = "suggestion-item place-item";
+                            li.textContent = station.station_name;
+                            li.className = "suggestion-item";
                             li.addEventListener("click", () => {
-                                input.value = place.name || displayName;
-                                typeInput.value = "coordinate";
-                                latInput.value = place.lat;
-                                lngInput.value = place.lon;
+                                input.value = station.station_name;
+                                typeInput.value = "station";
+                                latInput.value = station.lat;
+                                lngInput.value = station.lng;
                                 suggestions.innerHTML = "";
                             });
                             suggestions.appendChild(li);
                             resultsCount++;
                         });
                     }
-                } catch(e) {
-                    console.error("Geocoding failed", e);
                 }
-            }
 
-            if (resultsCount === 0) {
-                suggestions.innerHTML = `<li class="no-suggestion">No locations found</li>`;
-            }
+                // 2. Search OpenStreetMap (Nominatim) for addresses
+                if (query.length >= 3) {
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&city=Karachi&limit=4`);
+                        const places = await response.json();
 
-        }, 400); // 400ms debounce
-    });
-    
-    // Close suggestions on outside click
-    document.addEventListener('click', (e) => {
-        if (e.target !== input && e.target !== suggestions) {
-            suggestions.innerHTML = "";
+                        if (places.length > 0) {
+                            const header = document.createElement("li");
+                            header.className = "suggestion-header";
+                            header.textContent = "Places & Addresses";
+                            suggestions.appendChild(header);
+
+                            places.forEach(place => {
+                                const li = document.createElement("li");
+                                const displayName = place.display_name.split(',').slice(0, 2).join(','); // keep it short
+                                li.innerHTML = `<strong>${place.name || displayName}</strong><br><small class="text-muted">${displayName}</small>`;
+                                li.className = "suggestion-item place-item";
+                                li.addEventListener("click", () => {
+                                    input.value = place.name || displayName;
+                                    typeInput.value = "coordinate";
+                                    latInput.value = place.lat;
+                                    lngInput.value = place.lon;
+                                    suggestions.innerHTML = "";
+                                });
+                                suggestions.appendChild(li);
+                                resultsCount++;
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Geocoding failed", e);
+                    }
+                }
+
+                if (resultsCount === 0) {
+                    suggestions.innerHTML = `<li class="no-suggestion">No locations found</li>`;
+                }
+
+            }, 400); // 400ms debounce
+        });
+
+        // Close suggestions on outside click
+        document.addEventListener('click', (e) => {
+            if (e.target !== input && e.target !== suggestions) {
+                suggestions.innerHTML = "";
+            }
+        });
+    }
+
+    setupAutocomplete("fromStation", "fromSuggestions", "from_type", "from_lat", "from_lng");
+    setupAutocomplete("toStation", "toSuggestions", "to_type", "to_lat", "to_lng");
+
+    // --- Map Picker Logic ---
+    let pickerMap = null;
+    let pickerMarker = null;
+    let currentPickerTarget = null; // 'from' or 'to'
+    let selectedLatLng = null;
+
+    function openMapPicker(target) {
+        currentPickerTarget = target;
+        document.getElementById('mapPickerTitle').textContent = target === 'from' ? 'Choose Starting Location' : 'Choose Destination';
+        document.getElementById('mapPickerModal').style.display = 'flex';
+
+        // Initialize map if it hasn't been already
+        if (!pickerMap) {
+            pickerMap = L.map('picker-map').setView([24.8607, 67.0011], 12); // Karachi center
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(pickerMap);
+
+            pickerMap.on('click', function (e) {
+                selectedLatLng = e.latlng;
+                if (pickerMarker) {
+                    pickerMarker.setLatLng(selectedLatLng);
+                } else {
+                    pickerMarker = L.marker(selectedLatLng).addTo(pickerMap);
+                }
+            });
         }
-    });
-}
 
-setupAutocomplete("fromStation", "fromSuggestions", "from_type", "from_lat", "from_lng");
-setupAutocomplete("toStation", "toSuggestions", "to_type", "to_lat", "to_lng");
-
-// --- Map Picker Logic ---
-let pickerMap = null;
-let pickerMarker = null;
-let currentPickerTarget = null; // 'from' or 'to'
-let selectedLatLng = null;
-
-function openMapPicker(target) {
-    currentPickerTarget = target;
-    document.getElementById('mapPickerTitle').textContent = target === 'from' ? 'Choose Starting Location' : 'Choose Destination';
-    document.getElementById('mapPickerModal').style.display = 'flex';
-    
-    // Initialize map if it hasn't been already
-    if (!pickerMap) {
-        pickerMap = L.map('picker-map').setView([24.8607, 67.0011], 12); // Karachi center
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(pickerMap);
-        
-        pickerMap.on('click', function(e) {
-            selectedLatLng = e.latlng;
-            if (pickerMarker) {
-                pickerMarker.setLatLng(selectedLatLng);
-            } else {
-                pickerMarker = L.marker(selectedLatLng).addTo(pickerMap);
-            }
-        });
+        // Resize map correctly after modal display
+        setTimeout(() => { pickerMap.invalidateSize(); }, 100);
     }
-    
-    // Resize map correctly after modal display
-    setTimeout(() => { pickerMap.invalidateSize(); }, 100);
-}
 
-function closeMapPicker() {
-    document.getElementById('mapPickerModal').style.display = 'none';
-}
-
-function confirmMapSelection() {
-    if (!selectedLatLng) {
-        alert("Please click on the map to drop a pin first.");
-        return;
+    function closeMapPicker() {
+        document.getElementById('mapPickerModal').style.display = 'none';
     }
-    
-    const latInput = document.getElementById(`${currentPickerTarget}_lat`);
-    const lngInput = document.getElementById(`${currentPickerTarget}_lng`);
-    const typeInput = document.getElementById(`${currentPickerTarget}_type`);
-    const textInput = document.getElementById(`${currentPickerTarget}Station`);
-    
-    latInput.value = selectedLatLng.lat;
-    lngInput.value = selectedLatLng.lng;
-    typeInput.value = "coordinate";
-    
-    // Reverse geocode to get a nice name for the input field
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLatLng.lat}&lon=${selectedLatLng.lng}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.display_name) {
-                textInput.value = data.name || data.display_name.split(',').slice(0, 2).join(',');
-            } else {
+
+    function confirmMapSelection() {
+        if (!selectedLatLng) {
+            alert("Please click on the map to drop a pin first.");
+            return;
+        }
+
+        const latInput = document.getElementById(`${currentPickerTarget}_lat`);
+        const lngInput = document.getElementById(`${currentPickerTarget}_lng`);
+        const typeInput = document.getElementById(`${currentPickerTarget}_type`);
+        const textInput = document.getElementById(`${currentPickerTarget}Station`);
+
+        latInput.value = selectedLatLng.lat;
+        lngInput.value = selectedLatLng.lng;
+        typeInput.value = "coordinate";
+
+        // Reverse geocode to get a nice name for the input field
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLatLng.lat}&lon=${selectedLatLng.lng}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.display_name) {
+                    textInput.value = data.name || data.display_name.split(',').slice(0, 2).join(',');
+                } else {
+                    textInput.value = `Dropped Pin (${selectedLatLng.lat.toFixed(4)}, ${selectedLatLng.lng.toFixed(4)})`;
+                }
+            })
+            .catch(() => {
                 textInput.value = `Dropped Pin (${selectedLatLng.lat.toFixed(4)}, ${selectedLatLng.lng.toFixed(4)})`;
-            }
-        })
-        .catch(() => {
-            textInput.value = `Dropped Pin (${selectedLatLng.lat.toFixed(4)}, ${selectedLatLng.lng.toFixed(4)})`;
-        });
-        
-    closeMapPicker();
-}
+            });
 
-function submitRouteForm() {
-    // If coordinates are missing but text exists, default to station search
-    const form = document.getElementById('routeForm');
-    if (!document.getElementById('from_lat').value) {
-        document.getElementById('from_type').value = 'station';
+        closeMapPicker();
     }
-    if (!document.getElementById('to_lat').value) {
-        document.getElementById('to_type').value = 'station';
+
+    function submitRouteForm() {
+        // If coordinates are missing but text exists, default to station search
+        const form = document.getElementById('routeForm');
+        if (!document.getElementById('from_lat').value) {
+            document.getElementById('from_type').value = 'station';
+        }
+        if (!document.getElementById('to_lat').value) {
+            document.getElementById('to_type').value = 'station';
+        }
+        form.submit();
     }
-    form.submit();
-}
 </script>
 
 {% endblock body %}

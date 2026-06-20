@@ -1,10 +1,26 @@
+/* ============================================
+   FOOTER — Black & Green Theme
+   ============================================ */
 
 .site-footer {
-    background: #111;             
-    color: #aaa;
-    padding: 60px 20px 30px;     
-    margin-top: 60px;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-deep) 100%);
+    color: var(--text-secondary);
+    padding: 60px 20px 30px;
+    margin-top: 80px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    border-top: 1px solid var(--border-green);
+    position: relative;
+}
+
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green-primary), transparent);
+    opacity: 0.5;
 }
 
 .footer-container {
@@ -14,37 +30,56 @@
 }
 
 .footer-brand h2 {
-    color: #fff;
-    font-size: 1.6rem;
-    font-weight: 600;
+    color: var(--green-primary);
+    font-size: 1.8rem;
+    font-weight: 700;
     margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 30px var(--green-glow);
 }
+
 .footer-brand p {
-    font-size: .95rem;
-    color: #bbb;
+    font-size: 0.95rem;
+    color: var(--text-muted);
     margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .footer-links {
     margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
+
 .footer-links a {
-    color: #ccc;
-    margin: 0 15px;
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: .95rem;
-    transition: color .2s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+    border: 1px solid transparent;
 }
+
 .footer-links a:hover {
-    color: #0aad0a; 
+    color: var(--green-primary);
+    background: var(--green-subtle);
+    border-color: var(--border-green);
 }
 
 .footer-copy {
-    border-top: 1px solid #333;
-    padding-top: 15px;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 20px;
 }
+
 .footer-copy p {
-    font-size: .85rem;
-    color: #777;
+    font-size: 0.85rem;
+    color: var(--text-muted);
     margin: 0;
 }

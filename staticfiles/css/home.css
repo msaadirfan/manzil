@@ -1,58 +1,139 @@
+/* ============================================
+   HOME PAGE — Black & Green Theme
+   ============================================ */
 
+/* ---------- Hero Section ---------- */
 .hero-section {
     position: relative;
-    height: 60vh;
-    background: url('/static/images/your-bg.jpg') center/cover no-repeat;
+    min-height: 65vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 30% 50%, rgba(0, 230, 118, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 80%, rgba(0, 200, 83, 0.05) 0%, transparent 50%),
+        var(--bg-deep);
 }
 
-.hero-overlay {
+/* Animated grid overlay */
+.hero-section::before {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: none;
+    background-image:
+        linear-gradient(rgba(0, 230, 118, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 230, 118, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridPulse 8s ease-in-out infinite;
+}
+
+/* Floating glow orb */
+.hero-section::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 230, 118, 0.12) 0%, transparent 70%);
+    top: 20%;
+    right: -100px;
+    animation: floatOrb 10s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes gridPulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes floatOrb {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    33% {
+        transform: translate(-30px, 20px);
+    }
+
+    66% {
+        transform: translate(20px, -30px);
+    }
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    padding: 40px 20px 120px 20px;
+}
+
+.hero-content {
+    text-align: center;
 }
 
 .hero-content h1 {
-    font-size: 3rem;
-    font-weight: 700;
+    font-size: 3.5rem;
+    font-weight: 800;
     margin-bottom: 1rem;
+    line-height: 1.15;
+    background: linear-gradient(135deg, #ffffff 0%, var(--green-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .hero-content p {
-    font-size: 1.25rem;
-    color: #ddd;
-    max-width: 700px;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    max-width: 600px;
     margin: 0 auto;
+    line-height: 1.7;
 }
 
-
+/* ---------- Route Finder Section ---------- */
 .route-finder-section {
-    max-width: 800px;
-    margin: -80px auto 60px auto;
-    background-color: #1e1e1e;
+    max-width: 680px;
+    margin: -60px auto 60px auto;
+    position: relative;
+    z-index: 2;
+    background: var(--bg-card);
     padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-green);
+    box-shadow: var(--shadow-lg), var(--shadow-green);
     text-align: center;
 }
 
 .route-finder-section h2 {
-    font-size: 2rem;
+    font-size: 1.6rem;
     margin-bottom: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .route-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.route-form .btn-primary {
+    margin-top: 16px;
 }
 
 .form-group {
@@ -64,73 +145,264 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-with-btn {
+    display: flex;
+    align-items: center;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.input-with-btn:focus-within {
+    border-color: var(--green-primary);
+    box-shadow: 0 0 0 3px var(--green-glow), var(--shadow-green);
+    background-color: var(--bg-hover);
 }
 
 .form-group input {
+    flex: 1;
     width: 100%;
-    padding: 12px 15px;
-    border-radius: 8px;
+    padding: 14px 16px;
     border: none;
-    background-color: #2c2c2c;
-    color: #f5f5f5;
+    background: transparent;
+    color: var(--text-primary);
     font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-group input::placeholder {
+    color: var(--text-muted);
 }
 
 .form-group input:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 150, 255, 0.5);
 }
 
+.btn-map-picker {
+    background: none;
+    border: none;
+    padding: 10px 14px;
+    margin-right: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.btn-map-picker:hover {
+    background: var(--bg-elevated);
+    color: var(--green-primary);
+}
+
+/* ---------- Autocomplete Suggestions ---------- */
 .suggestions-list {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    background: #2c2c2c;
-    border-radius: 0 0 8px 8px;
-    max-height: 200px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    max-height: 220px;
     overflow-y: auto;
     z-index: 1000;
     margin: 0;
     padding: 0;
     list-style: none;
+    box-shadow: var(--shadow-md);
 }
 
-.suggestion-item, .no-suggestion {
-    padding: 10px 15px;
+.suggestion-item {
+    padding: 12px 16px;
     cursor: pointer;
+    font-size: 0.95rem;
+    transition: background var(--transition-fast);
+}
+
+.suggestion-header {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--green-primary);
+    font-weight: 700;
+    background: var(--bg-elevated);
+    pointer-events: none;
+}
+
+.place-item {
+    line-height: 1.3;
+}
+
+.place-item strong {
+    color: var(--text-primary);
+}
+
+.place-item small {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
 }
 
 .suggestion-item:hover {
-    background-color: #333;
+    background-color: var(--green-subtle);
+    color: var(--green-primary);
+    padding-left: 24px;
 }
 
-.btn-primary {
-    background-color: #363c42;
-    color: #fff;
-    padding: 14px 25px;
+.no-suggestion {
+    padding: 12px 18px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ---------- Find Route Button ---------- */
+.route-form .btn-primary {
+    background: linear-gradient(135deg, var(--green-primary), var(--green-hover));
+    color: var(--text-on-green);
+    padding: 16px 30px;
     font-size: 1.1rem;
+    font-weight: 700;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-green);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
+.route-form .btn-primary:hover {
+    background: linear-gradient(135deg, var(--green-hover), var(--green-dark));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-green-lg);
 }
 
-.main-footer {
-    background-color: #1b1b1b;
-    color: #888;
-    text-align: center;
-    padding: 20px 0;
+.route-form .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ---------- Map Link Hint ---------- */
+.map-hint {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.map-hint a {
+    color: var(--green-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.map-hint a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ---------- Map Modal ---------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-modal-content {
+    background: var(--bg-card);
+    width: 90%;
+    max-width: 600px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-elevated);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.map-instruction {
     font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
 }
 
+#picker-map {
+    height: 350px;
+    width: 100%;
+    border-radius: var(--radius-md);
+    background: #222;
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-elevated);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-secondary {
+    padding: 10px 20px;
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* ---------- Buttons ---------- */
+/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .hero-content h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
 
     .hero-content p {
@@ -138,7 +410,22 @@
     }
 
     .route-finder-section {
-        margin: -50px 20px 40px 20px;
-        padding: 30px;
+        margin: -40px 16px 40px 16px;
+        padding: 28px 20px;
+    }
+
+    .hero-section::after {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .route-finder-section h2 {
+        font-size: 1.3rem;
     }
 }
