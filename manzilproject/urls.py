@@ -25,6 +25,5 @@ admin.site.index_title = "Welcome to Manzil Admin Portal"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('routefinder.urls')),
-    path('debug/', views.debug_station),
 
 ]
