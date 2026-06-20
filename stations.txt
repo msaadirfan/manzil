@@ -9,7 +9,7 @@ station_id,station_name,lat,lng
 8,Erum Shopping,24.960556,67.063611
 9,Sakhi Hasan Chowrangi,24.953889,67.0575
 10,Five Star Chowrangi,24.945833,67.050278
-11,Hyderi Bus/Market,24.9375,67.043056
+11,Hyderi Bus Market,24.9375,67.043056
 12,KDA Chowrangi,24.931111,67.0375
 13,Board Office - Nazimabad,24.925,67.031944
 14,Nazimabad No.7,24.918333,67.031111
@@ -64,7 +64,7 @@ station_id,station_name,lat,lng
 63,Natha Khan,24.886944,67.135
 64,Drigh Road,24.886944,67.125278
 65,PAF Base Faisal,24.882778,67.113056
-66,Karsaz/Golf Club,24.876389,67.101667
+66,Karsaz Golf Club,24.876389,67.101667
 67,PAF Museum,24.873889,67.094167
 68,Awami Markaz,24.871111,67.089444
 69,Baloch Colony,24.867222,67.082778
@@ -79,8 +79,8 @@ station_id,station_name,lat,lng
 78,Rahat Park,24.815278,67.075833
 79,Masjid-e-Ayesha,24.802222,67.077222
 80,26th Street,24.787222,67.062778
-81,Clock Tower DHA/Sea View,24.778611,67.054444
-82,Dolmen Mall/Clifton Beach,24.802778,67.030278
+81,Clock Tower DHA Sea View,24.778611,67.054444
+82,Dolmen Mall Clifton Beach,24.802778,67.030278
 83,Ibrahim Hyderi,24.794444,67.136111
 84,PARCO,24.801667,67.133056
 85,Indus Hospital,24.816944,67.107778

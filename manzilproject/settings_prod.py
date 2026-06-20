@@ -118,7 +118,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
 # ============================================
 
 # Security Middleware Settings
-SECURE_SSL_REDIRECT = True  # Redirect all HTTP to HTTPS
+SECURE_SSL_REDIRECT = False  # Redirect all HTTP to HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Cookie Security
