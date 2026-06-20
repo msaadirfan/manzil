@@ -7,15 +7,11 @@
       "config": {
         "maxLambdaSize": "15mb",
         "runtime": "python3.12",
-        "buildCommand": "python manage.py collectstatic --no-input --settings=manzilproject.settings_production"
+        "buildCommand": "bash build.sh"
       }
     }
   ],
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/staticfiles/static/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "manzilproject/wsgi.py"
