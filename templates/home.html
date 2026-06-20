@@ -246,25 +246,39 @@
         const typeInput = document.getElementById(`${currentPickerTarget}_type`);
         const textInput = document.getElementById(`${currentPickerTarget}Station`);
 
-        latInput.value = selectedLatLng.lat;
-        lngInput.value = selectedLatLng.lng;
+        // Store coordinates before closing
+        const savedLat = selectedLatLng.lat;
+        const savedLng = selectedLatLng.lng;
+
+        latInput.value = savedLat;
+        lngInput.value = savedLng;
         typeInput.value = "coordinate";
 
-        // Reverse geocode to get a nice name for the input field
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLatLng.lat}&lon=${selectedLatLng.lng}`)
+        closeMapPicker();
+
+        // Reverse geocode for display name only
+        // Use a flag to prevent the input event listener from clearing our values
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${savedLat}&lon=${savedLng}`)
             .then(res => res.json())
             .then(data => {
-                if (data.display_name) {
-                    textInput.value = data.name || data.display_name.split(',').slice(0, 2).join(',');
-                } else {
-                    textInput.value = `Dropped Pin (${selectedLatLng.lat.toFixed(4)}, ${selectedLatLng.lng.toFixed(4)})`;
-                }
+                const name = data.name || data.display_name.split(',').slice(0, 2).join(',')
+                    || `Pin (${savedLat.toFixed(4)}, ${savedLng.toFixed(4)})`;
+
+                // Set value WITHOUT triggering input event
+                textInput.removeEventListener("input", textInput._inputHandler);
+                textInput.value = name;
+
+                // Re-affirm coordinate values after setting text
+                latInput.value = savedLat;
+                lngInput.value = savedLng;
+                typeInput.value = "coordinate";
             })
             .catch(() => {
-                textInput.value = `Dropped Pin (${selectedLatLng.lat.toFixed(4)}, ${selectedLatLng.lng.toFixed(4)})`;
+                textInput.value = `Pin (${savedLat.toFixed(4)}, ${savedLng.toFixed(4)})`;
+                latInput.value = savedLat;
+                lngInput.value = savedLng;
+                typeInput.value = "coordinate";
             });
-
-        closeMapPicker();
     }
 
     function submitRouteForm() {
