@@ -6,7 +6,12 @@ from dijkstras import get_connected_component
 def normalize(name: str) -> str: 
     if not name:
         return ""
-    return " ".join(name.strip().split()).title()
+    # Use title case but fix number suffixes like 26th, 1st, 2nd, 3rd
+    result = " ".join(name.strip().split()).title()
+    # Fix ordinal suffixes that .title() incorrectly capitalizes
+    import re
+    result = re.sub(r'(\d+)(St|Nd|Rd|Th)\b', lambda m: m.group(1) + m.group(2).lower(), result)
+    return result
 
 def transit_map(debug=False):
     
