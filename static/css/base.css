@@ -1,49 +1,247 @@
+/* ============================================
+   MANZIL DESIGN SYSTEM — Black & Green Theme
+   ============================================ */
 
-body {
-    background-color: #242424
-    ;
-    color: #e0e0e0;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
+/* ---------- Design Tokens ---------- */
+:root {
+    /* Greens */
+    --green-primary: #00E676;
+    --green-hover: #00C853;
+    --green-dark: #00A844;
+    --green-glow: rgba(0, 230, 118, 0.15);
+    --green-glow-strong: rgba(0, 230, 118, 0.3);
+    --green-subtle: rgba(0, 230, 118, 0.08);
+
+    /* Backgrounds */
+    --bg-deepest: #050505;
+    --bg-deep: #0A0A0A;
+    --bg-base: #0F0F0F;
+    --bg-elevated: #141414;
+    --bg-card: #1A1A1A;
+    --bg-input: #1E1E1E;
+    --bg-hover: #252525;
+
+    /* Text */
+    --text-primary: #F0F0F0;
+    --text-secondary: #A0A0A0;
+    --text-muted: #666666;
+    --text-on-green: #050505;
+
+    /* Borders */
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-green: rgba(0, 230, 118, 0.3);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-green: 0 0 20px rgba(0, 230, 118, 0.15);
+    --shadow-green-lg: 0 0 40px rgba(0, 230, 118, 0.2);
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.25s ease;
+    --transition-slow: 0.4s ease;
+
+    /* Glass */
+    --glass-bg: rgba(20, 20, 20, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(20px);
 }
 
-/* Navbar */
+/* ---------- Global Reset & Base ---------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Custom Scrollbar ---------- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--green-primary);
+}
+
+/* ---------- Selection ---------- */
+::selection {
+    background: var(--green-glow-strong);
+    color: var(--text-primary);
+}
+
+/* ---------- Navbar ---------- */
 .navbar {
-    background-color: #111 !important;
-    transition: background-color 0.3s ease;
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--glass-border);
+    transition: all var(--transition-base);
+    padding: 0.8rem 0;
 }
 
 .navbar .navbar-brand {
-    color: #ffffff !important;
-    letter-spacing: 1px;
+    color: var(--green-primary) !important;
+    letter-spacing: 2px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    transition: all var(--transition-base);
+}
+
+.navbar .navbar-brand:hover {
+    text-shadow: 0 0 20px var(--green-glow-strong);
 }
 
 .navbar .nav-link {
-    color: #b0b0b0 !important;
-    margin-left: 1rem;
-    transition: color 0.2s ease;
-}
-
-.navbar .nav-link:hover,
-.navbar .nav-link.active {
-    color: #ffffff !important;
-    font-weight: 500;
-}
-
-
-.alert {
-    border-radius: 8px;
+    color: var(--text-secondary) !important;
+    margin-left: 0.5rem;
+    padding: 0.5rem 1rem !important;
     font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: all var(--transition-base);
+    position: relative;
+    border-radius: var(--radius-sm);
 }
 
+.navbar .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--green-primary);
+    transition: width var(--transition-base);
+    border-radius: 1px;
+}
 
+.navbar .nav-link:hover {
+    color: var(--text-primary) !important;
+}
+
+.navbar .nav-link:hover::after {
+    width: 60%;
+}
+
+.navbar .nav-link.active {
+    color: var(--green-primary) !important;
+    font-weight: 600;
+}
+
+.navbar .nav-link.active::after {
+    width: 60%;
+    box-shadow: 0 0 8px var(--green-glow);
+}
+
+/* Mobile toggler */
+.navbar-toggler {
+    border-color: var(--border-default) !important;
+    padding: 0.4rem 0.6rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 3px var(--green-glow);
+}
+
+.navbar-toggler-icon {
+    filter: brightness(0.8);
+}
+
+/* ---------- Alerts ---------- */
+.alert {
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-green);
+    color: var(--text-primary);
+}
+
+.alert-warning {
+    background: rgba(0, 230, 118, 0.05);
+    border-left: 4px solid var(--green-primary);
+    color: var(--text-primary);
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* ---------- Primary Button ---------- */
 .btn-primary {
-    background-color: #1db954;
+    background: linear-gradient(135deg, var(--green-primary), var(--green-hover));
     border: none;
-    font-weight: 500;
-    padding: 0.6rem 1.3rem;
-    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--radius-md);
+    color: var(--text-on-green);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-green);
+    letter-spacing: 0.3px;
 }
 
 .btn-primary:hover {
-    background-color: #1aa34a;
+    background: linear-gradient(135deg, var(--green-hover), var(--green-dark));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-green-lg);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ---------- Page Transition ---------- */
+main {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- Links ---------- */
+a {
+    color: var(--green-primary);
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--green-hover);
 }

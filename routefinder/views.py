@@ -14,6 +14,18 @@ from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 import re
+import math
+
+# Haversine formula to calculate distance between two lat/lng coordinates in km
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371  # Earth radius in kilometers
+    dLat = math.radians(lat2 - lat1)
+    dLon = math.radians(lon2 - lon1)
+    lat1 = math.radians(lat1)
+    lat2 = math.radians(lat2)
+    a = math.sin(dLat/2)**2 + math.cos(lat1)*math.cos(lat2)*math.sin(dLon/2)**2
+    c = 2 * math.asin(math.sqrt(a))
+    return R * c
 
 
 # Input sanitization helper
@@ -164,33 +176,65 @@ def station_search(request):
 def find_route(request):
     """Route finder with rate limiting and validation"""
     if request.method == "POST":
-        # Sanitize inputs
+        # Read new input fields
         from_station_raw = sanitize_input(request.POST.get("fromStation", ""), 200)
         to_station_raw = sanitize_input(request.POST.get("toStation", ""), 200)
         
+        from_type = request.POST.get("from_type", "station")
+        from_lat = request.POST.get("from_lat", "")
+        from_lng = request.POST.get("from_lng", "")
+        
+        to_type = request.POST.get("to_type", "station")
+        to_lat = request.POST.get("to_lat", "")
+        to_lng = request.POST.get("to_lng", "")
+        
         if not from_station_raw or not to_station_raw:
-            messages.error(request, "Please enter both start and destination stations.")
+            messages.error(request, "Please enter both start and destination locations.")
             return render(request, "home.html")
-        
-        from_station = normalize(from_station_raw)
-        to_station = normalize(to_station_raw)
-        
-        if from_station == to_station:
-            messages.error(request, "Please select different stations.")
-            return render(request, "home.html")
+            
+        walk_start_distance = 0
+        walk_end_distance = 0
+        from_station = None
+        to_station = None
         
         try:
             graph, route_info, routes_per_station = transit_map(debug=False)
+            all_stations = Station.objects.filter(lat__isnull=False, lng__isnull=False)
             
-            # Validate stations exist
+            # --- Resolve FROM Location ---
+            if from_type == "coordinate" and from_lat and from_lng:
+                from_lat_f = float(from_lat)
+                from_lng_f = float(from_lng)
+                closest_start = min(all_stations, key=lambda s: haversine(from_lat_f, from_lng_f, s.lat, s.lng))
+                from_station = closest_start.station_name
+                walk_start_distance = haversine(from_lat_f, from_lng_f, closest_start.lat, closest_start.lng)
+            else:
+                from_station = normalize(from_station_raw)
+                
+            # --- Resolve TO Location ---
+            if to_type == "coordinate" and to_lat and to_lng:
+                to_lat_f = float(to_lat)
+                to_lng_f = float(to_lng)
+                closest_end = min(all_stations, key=lambda s: haversine(to_lat_f, to_lng_f, s.lat, s.lng))
+                to_station = closest_end.station_name
+                walk_end_distance = haversine(to_lat_f, to_lng_f, closest_end.lat, closest_end.lng)
+            else:
+                to_station = normalize(to_station_raw)
+
+            # Validate stations exist in graph
             if from_station not in graph:
-                messages.error(request, f"Start station '{from_station_raw}' not found.")
+                messages.error(request, f"Start station '{from_station}' not found in transit network.")
                 return render(request, "home.html")
             
             if to_station not in graph:
-                messages.error(request, f"Destination station '{to_station_raw}' not found.")
+                messages.error(request, f"Destination station '{to_station}' not found in transit network.")
+                return render(request, "home.html")
+                
+            if from_station == to_station and walk_start_distance == 0 and walk_end_distance == 0:
+                messages.error(request, "Please select different locations.")
                 return render(request, "home.html")
             
+            # Dijkstra Routing between the actual stations
             cost, path_with_routes = dijkstra(graph, route_info, from_station, to_station, debug=False)
             
             if cost == float("inf"):
@@ -200,23 +244,68 @@ def find_route(request):
             route_segments = analyze_route_path(path_with_routes)
             num_transfers = max(0, len(route_segments) - 1)
             simple_path = [station_info['station'] for station_info in path_with_routes]
-            avg_speed_of_bus = 26
-            travel_time = (cost / avg_speed_of_bus) * 60
+            
+            avg_speed_of_bus = 26 # km/h
+            transit_travel_time = (cost / avg_speed_of_bus) * 60
+            
+            avg_walking_speed = 5 # km/h
+            walk_time = ((walk_start_distance + walk_end_distance) / avg_walking_speed) * 60
+            
+            total_time = transit_travel_time + walk_time
+            total_distance = cost + walk_start_distance + walk_end_distance
+            
+            # Fetch coordinates for map rendering
+            stations_qs = Station.objects.filter(station_name__in=simple_path)
+            coords_dict = {s.station_name: {'lat': s.lat, 'lng': s.lng} for s in stations_qs if s.lat and s.lng}
+            
+            map_segments = []
+            for segment in route_segments:
+                seg_coords = []
+                for st in segment['stations']:
+                    if st in coords_dict:
+                        seg_coords.append([coords_dict[st]['lat'], coords_dict[st]['lng']])
+                map_segments.append({
+                    'route_id': segment['route_id'],
+                    'coords': seg_coords,
+                    'stations': segment['stations']
+                })
+            
+            import json
+            map_segments_json = json.dumps(map_segments)
+            coords_dict_json = json.dumps(coords_dict)
+            
+            walk_data = {
+                'start_dist': round(walk_start_distance, 2),
+                'start_time': round((walk_start_distance / avg_walking_speed) * 60),
+                'start_lat': float(from_lat) if from_type == 'coordinate' else None,
+                'start_lng': float(from_lng) if from_type == 'coordinate' else None,
+                'end_dist': round(walk_end_distance, 2),
+                'end_time': round((walk_end_distance / avg_walking_speed) * 60),
+                'end_lat': float(to_lat) if to_type == 'coordinate' else None,
+                'end_lng': float(to_lng) if to_type == 'coordinate' else None,
+            }
+            walk_data_json = json.dumps(walk_data)
             
             return render(
                 request,
                 "routes.html",
                 {
+                    "from_location_name": from_station_raw,
+                    "to_location_name": to_station_raw,
                     "from_station": from_station,
                     "to_station": to_station,
                     "path": simple_path,
                     "path_with_routes": path_with_routes,
                     "route_segments": route_segments,
-                    "total_distance": round(cost, 2),
+                    "total_distance": round(total_distance, 2),
                     "num_stations": len(simple_path),
                     "num_transfers": num_transfers,
-                    "travel_time": round(travel_time),
-                    "routes_used": [seg['route_id'] for seg in route_segments]
+                    "travel_time": round(total_time),
+                    "routes_used": [seg['route_id'] for seg in route_segments],
+                    "map_segments_json": map_segments_json,
+                    "coords_dict_json": coords_dict_json,
+                    "walk_data": walk_data,
+                    "walk_data_json": walk_data_json
                 },
             )
             

@@ -13,8 +13,8 @@
     <header class="route-header">
         <h1>Route Preview</h1>
         <p>
-            <span class="highlight" id="from_station_text">{{ from_station }}</span> →  
-            <span class="highlight" id="to_station_text">{{ to_station }}</span>
+            <span class="highlight" id="from_station_text">{{ from_location_name|default:from_station }}</span> →  
+            <span class="highlight" id="to_station_text">{{ to_location_name|default:to_station }}</span>
         </p>
     </header>
 
@@ -38,7 +38,21 @@
             </div>
         </div>
 
+        <!-- Add Map Snippet -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <div id="route-snippet-map" class="route-map-container"></div>
+
         <div class="timeline">
+            {% if walk_data and walk_data.start_dist > 0 %}
+            <div class="timeline-item walk" style="--line-color: #888;">
+                <div class="marker"></div>
+                <div class="details">
+                    <h4>Walk from {{ from_location_name }}</h4>
+                    <p class="small">Walk {{ walk_data.start_dist }} km (~{{ walk_data.start_time }} min) to {{ from_station }}</p>
+                </div>
+            </div>
+            {% endif %}
+
             {% for segment in route_segments %}
                 {% for station in segment.stations %}
                     <div class="timeline-item 
@@ -63,6 +77,16 @@
                     </div>
                 {% endfor %}
             {% endfor %}
+
+            {% if walk_data and walk_data.end_dist > 0 %}
+            <div class="timeline-item walk" style="--line-color: transparent;">
+                <div class="marker"></div>
+                <div class="details">
+                    <h4>Walk to {{ to_location_name }}</h4>
+                    <p class="small">Walk {{ walk_data.end_dist }} km (~{{ walk_data.end_time }} min) from {{ to_station }}</p>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
     {% else %}
@@ -75,5 +99,142 @@
         </div>
     {% endif %}
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const mapSegments = {{ map_segments_json|safe|default:"[]" }};
+        const coordsDict = {{ coords_dict_json|safe|default:"{}" }};
+        
+        if (!mapSegments || mapSegments.length === 0) return;
+
+        const map = L.map('route-snippet-map', {
+            zoomControl: false,
+            scrollWheelZoom: false // disable scrolling so it doesn't interrupt page scrolling
+        });
+
+        // Dark theme map tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        L.control.zoom({ position: 'topright' }).addTo(map);
+
+        const routeColors = {
+            "EV1": "#0066CC", "EV2": "#00AA00", "EV3": "#FF1493", "EV4": "#8B008B",
+            "EV5": "#FF6600", "R1": "#FFD700", "R2": "#8B4513", "R3": "#32CD32",
+            "R4": "#1E90FF", "R8": "#FF69B4", "R9": "#4169E1", "R10": "#FF4500",
+            "R11": "#9370DB", "R12": "#20B2AA", "R13": "#DC143C", "OL": "#FFA500", "GL": "#228B22"
+        };
+
+        const bounds = L.latLngBounds();
+
+        // Draw segments
+        mapSegments.forEach(segment => {
+            if (segment.coords.length > 0) {
+                const color = routeColors[segment.route_id] || "#00E676";
+                
+                // Outline
+                L.polyline(segment.coords, {
+                    color: '#1a1a1a',
+                    weight: 6,
+                    opacity: 0.6,
+                    lineJoin: 'round',
+                    lineCap: 'round'
+                }).addTo(map);
+
+                // Main line
+                L.polyline(segment.coords, {
+                    color: color,
+                    weight: 3,
+                    opacity: 1.0,
+                    lineJoin: 'round',
+                    lineCap: 'round'
+                }).addTo(map);
+
+                segment.coords.forEach(coord => bounds.extend(coord));
+            }
+        });
+
+        // Draw station markers for important points
+        const importantStations = [];
+        // Start station
+        importantStations.push(mapSegments[0].stations[0]);
+        // Transfer stations
+        for (let i = 1; i < mapSegments.length; i++) {
+            importantStations.push(mapSegments[i].stations[0]);
+        }
+        // End station
+        importantStations.push(mapSegments[mapSegments.length - 1].stations[mapSegments[mapSegments.length - 1].stations.length - 1]);
+
+        // Draw regular stations small, important stations large
+        Object.keys(coordsDict).forEach(stationName => {
+            const coord = [coordsDict[stationName].lat, coordsDict[stationName].lng];
+            const isImportant = importantStations.includes(stationName);
+
+            L.circleMarker(coord, {
+                radius: isImportant ? 6 : 3,
+                fillColor: isImportant ? '#00E676' : '#ffffff',
+                color: '#1a1a1a',
+                weight: isImportant ? 2 : 1,
+                opacity: 1,
+                fillOpacity: 1
+            }).addTo(map).bindPopup(`<b>${stationName}</b>`);
+        });
+        
+        const walkData = {{ walk_data_json|safe|default:"null" }};
+        
+        // draw start walk
+        if (walkData && walkData.start_dist > 0) {
+            const startLatLng = [walkData.start_lat, walkData.start_lng];
+            const firstStationCoord = [coordsDict['{{ from_station|escapejs }}'].lat, coordsDict['{{ from_station|escapejs }}'].lng];
+            
+            L.polyline([startLatLng, firstStationCoord], {
+                color: '#888',
+                weight: 4,
+                dashArray: '5, 5'
+            }).addTo(map);
+            
+            L.circleMarker(startLatLng, {
+                radius: 6,
+                fillColor: '#888',
+                color: '#fff',
+                weight: 2,
+                opacity: 1, fillOpacity: 1
+            }).addTo(map).bindPopup(`<b>Start: ${'{{ from_location_name|escapejs }}'}</b>`);
+            
+            bounds.extend(startLatLng);
+        }
+        
+        // draw end walk
+        if (walkData && walkData.end_dist > 0) {
+            const endLatLng = [walkData.end_lat, walkData.end_lng];
+            const lastStationCoord = [coordsDict['{{ to_station|escapejs }}'].lat, coordsDict['{{ to_station|escapejs }}'].lng];
+            
+            L.polyline([lastStationCoord, endLatLng], {
+                color: '#888',
+                weight: 4,
+                dashArray: '5, 5'
+            }).addTo(map);
+            
+            L.circleMarker(endLatLng, {
+                radius: 6,
+                fillColor: '#888',
+                color: '#fff',
+                weight: 2,
+                opacity: 1, fillOpacity: 1
+            }).addTo(map).bindPopup(`<b>Destination: ${'{{ to_location_name|escapejs }}'}</b>`);
+            
+            bounds.extend(endLatLng);
+        }
+
+        // Fit map to route bounds
+        if (bounds.isValid()) {
+            map.fitBounds(bounds, { padding: [30, 30] });
+        }
+    });
+</script>
 
 {% endblock body %}
