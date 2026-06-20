@@ -187,6 +187,8 @@ def find_route(request):
         to_type = request.POST.get("to_type", "station")
         to_lat = request.POST.get("to_lat", "")
         to_lng = request.POST.get("to_lng", "")
+        import logging
+        logging.error(f"ROUTE_DEBUG | from_type={repr(from_type)} | from_lat={repr(from_lat)} | from_lng={repr(from_lng)} | fromStation={repr(from_station_raw)}")
         
         if not from_station_raw or not to_station_raw:
             messages.error(request, "Please enter both start and destination locations.")
@@ -461,15 +463,3 @@ def api_routes(request):
 def map_view(request):
     """Render the map page"""
     return render(request, 'map.html')
-
-def debug_station(request):
-    from transit import transit_map, normalize
-    graph, _, _ = transit_map()
-    test = normalize("Clock Tower DHA/Sea View")
-    in_graph = test in graph
-    clock_stations = [k for k in graph.keys() if 'Clock' in k]
-    return JsonResponse({
-        'normalized': test,
-        'in_graph': in_graph,
-        'clock_stations': clock_stations
-    })
