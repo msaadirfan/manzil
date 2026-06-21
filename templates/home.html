@@ -34,27 +34,26 @@
         <input type="hidden" id="to_type" name="to_type" value="station">
 
         <div class="form-group">
-            <label for="fromStation">From</label>
-            <div class="input-with-btn">
-                <input type="text" id="fromStation" name="fromStation"
-                    placeholder="Enter starting address or station..." autocomplete="off">
-                <button type="button" class="btn-map-picker" onclick="openMapPicker('from')"
-                    title="Choose on Map">Map</button>
-            </div>
-            <ul id="fromSuggestions" class="suggestions-list"></ul>
-        </div>
+    <label for="fromStation">From</label>
+    <div class="input-with-btn">
+        <input type="text" id="fromStation" name="fromStation"
+            placeholder="Enter starting address or station..." autocomplete="off">
+        <button type="button" class="btn-map-picker" onclick="useMyLocation('from')" title="Use My Location">My Location</button>
+        <button type="button" class="btn-map-picker" onclick="openMapPicker('from')" title="Choose on Map">Map</button>
+    </div>
+    <ul id="fromSuggestions" class="suggestions-list"></ul>
+</div>
 
-        <div class="form-group">
-            <label for="toStation">To</label>
-            <div class="input-with-btn">
-                <input type="text" id="toStation" name="toStation" placeholder="Enter destination address or station..."
-                    autocomplete="off">
-                <button type="button" class="btn-map-picker" onclick="openMapPicker('to')"
-                    title="Choose on Map">Map</button>
-            </div>
-            <ul id="toSuggestions" class="suggestions-list"></ul>
-        </div>
-
+<div class="form-group">
+    <label for="toStation">To</label>
+    <div class="input-with-btn">
+        <input type="text" id="toStation" name="toStation" placeholder="Enter destination address or station..."
+            autocomplete="off">
+        <button type="button" class="btn-map-picker" onclick="useMyLocation('to')" title="Use My Location">My Location</button>
+        <button type="button" class="btn-map-picker" onclick="openMapPicker('to')" title="Choose on Map">Map</button>
+    </div>
+    <ul id="toSuggestions" class="suggestions-list"></ul>
+</div>
         <button type="button" class="btn-primary" onclick="submitRouteForm()">Find Route</button>
         <p class="map-hint">Not sure about station names? <a href="/map">View the transit map →</a></p>
     </form>
@@ -259,7 +258,7 @@
 
         // Show a temporary placeholder while reverse geocoding
         const textInput = document.getElementById(`${target}Station`);
-        textInput.value = `📍 Pin (${savedLat.toFixed(4)}, ${savedLng.toFixed(4)})`;
+        textInput.value = `Pin (${savedLat.toFixed(4)}, ${savedLng.toFixed(4)})`;
 
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${savedLat}&lon=${savedLng}`)
             .then(res => res.json())
@@ -269,6 +268,57 @@
             })
             .catch(() => { });
     }
+    function useMyLocation(target) {
+    if (!navigator.geolocation) {
+        alert("Your browser doesn't support location access.");
+        return;
+    }
+
+    const textInput = document.getElementById(`${target}Station`);
+    textInput.value = "📍 Getting your location...";
+
+    navigator.geolocation.getCurrentPosition(
+        // Success
+        function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            // Store in JS variables (same as map picker)
+            if (target === 'from') {
+                confirmedFrom = { lat: lat, lng: lng };
+            } else {
+                confirmedTo = { lat: lat, lng: lng };
+            }
+
+            // Reverse geocode to get a readable name
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    const name = data.name || data.display_name.split(',').slice(0, 2).join(',');
+                    textInput.value = `${name}`;
+                })
+                .catch(() => {
+                    textInput.value = `My Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                });
+        },
+        // Error
+        function(error) {
+            const messages = {
+                1: "Location access denied. Please allow location in your browser settings.",
+                2: "Location unavailable. Try using the map picker instead.",
+                3: "Location request timed out. Try again."
+            };
+            alert(messages[error.code] || "Could not get your location.");
+            textInput.value = "";
+        },
+        // Options
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
 
     function submitRouteForm() {
         const form = document.getElementById('routeForm');
