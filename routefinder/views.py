@@ -266,8 +266,13 @@ def find_route(request):
             total_distance = cost + walk_start_distance + walk_end_distance
             
             # Fetch coordinates for map rendering
-            stations_qs = Station.objects.filter(station_name__in=simple_path)
-            coords_dict = {s.station_name: {'lat': s.lat, 'lng': s.lng} for s in stations_qs if s.lat and s.lng}
+            # NEW - normalize DB names to match simple_path
+            all_station_objs = Station.objects.filter(lat__isnull=False, lng__isnull=False)
+            coords_dict = {}
+            for s in all_station_objs:
+                normalized = normalize(s.station_name)
+                if normalized in simple_path:
+                   coords_dict[normalized] = {'lat': s.lat, 'lng': s.lng}
             
             map_segments = []
             for segment in route_segments:
