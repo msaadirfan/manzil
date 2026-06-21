@@ -47,8 +47,8 @@
             <div class="timeline-item walk" style="--line-color: #888;">
                 <div class="marker"></div>
                 <div class="details">
-                    <h4>Walk from {{ from_location_name }}</h4>
-                    <p class="small">Walk {{ walk_data.start_dist }} km (~{{ walk_data.start_time }} min) to {{ from_station }}</p>
+                    <h4>walk/commute from {{ from_location_name }}</h4>
+                    <p class="small">walk/commute {{ walk_data.start_dist }} km (~{{ walk_data.start_time }} min) to {{ from_station }}</p>
                 </div>
             </div>
             {% endif %}
@@ -82,8 +82,8 @@
             <div class="timeline-item walk" style="--line-color: transparent;">
                 <div class="marker"></div>
                 <div class="details">
-                    <h4>Walk to {{ to_location_name }}</h4>
-                    <p class="small">Walk {{ walk_data.end_dist }} km (~{{ walk_data.end_time }} min) from {{ to_station }}</p>
+                    <h4>walk/commute to {{ to_location_name }}</h4>
+                    <p class="small">walk/commute {{ walk_data.end_dist }} km (~{{ walk_data.end_time }} min) from {{ to_station }}</p>
                 </div>
             </div>
             {% endif %}
