@@ -176,7 +176,6 @@ def station_search(request):
 def find_route(request):
     """Route finder with rate limiting and validation"""
     if request.method == "POST":
-        # Read new input fields
         from_station_raw = sanitize_input(request.POST.get("fromStation", ""), 200)
         to_station_raw = sanitize_input(request.POST.get("toStation", ""), 200)
         
@@ -187,8 +186,6 @@ def find_route(request):
         to_type = request.POST.get("to_type", "station")
         to_lat = request.POST.get("to_lat", "")
         to_lng = request.POST.get("to_lng", "")
-        import logging
-        logging.error(f"ROUTE_DEBUG | from_type={repr(from_type)} | from_lat={repr(from_lat)} | from_lng={repr(from_lng)} | fromStation={repr(from_station_raw)}")
         
         if not from_station_raw or not to_station_raw:
             messages.error(request, "Please enter both start and destination locations.")
@@ -201,24 +198,36 @@ def find_route(request):
         
         try:
             graph, route_info, routes_per_station = transit_map(debug=False)
-            all_stations = Station.objects.filter(lat__isnull=False, lng__isnull=False)
+            all_stations = list(Station.objects.filter(lat__isnull=False, lng__isnull=False))
             
+            if not all_stations:
+                messages.error(request, "No station data available. Please try again later.")
+                return render(request, "home.html")
+
             # --- Resolve FROM Location ---
             if from_type == "coordinate" and from_lat and from_lng:
-                from_lat_f = float(from_lat)
-                from_lng_f = float(from_lng)
+                try:
+                    from_lat_f = float(from_lat)
+                    from_lng_f = float(from_lng)
+                except ValueError:
+                    messages.error(request, "Invalid coordinates for start location.")
+                    return render(request, "home.html")
                 closest_start = min(all_stations, key=lambda s: haversine(from_lat_f, from_lng_f, s.lat, s.lng))
-                from_station = closest_start.station_name
+                from_station = normalize(closest_start.station_name)
                 walk_start_distance = haversine(from_lat_f, from_lng_f, closest_start.lat, closest_start.lng)
             else:
                 from_station = normalize(from_station_raw)
-                
+
             # --- Resolve TO Location ---
             if to_type == "coordinate" and to_lat and to_lng:
-                to_lat_f = float(to_lat)
-                to_lng_f = float(to_lng)
+                try:
+                    to_lat_f = float(to_lat)
+                    to_lng_f = float(to_lng)
+                except ValueError:
+                    messages.error(request, "Invalid coordinates for destination.")
+                    return render(request, "home.html")
                 closest_end = min(all_stations, key=lambda s: haversine(to_lat_f, to_lng_f, s.lat, s.lng))
-                to_station = closest_end.station_name
+                to_station = normalize(closest_end.station_name)
                 walk_end_distance = haversine(to_lat_f, to_lng_f, closest_end.lat, closest_end.lng)
             else:
                 to_station = normalize(to_station_raw)
@@ -236,7 +245,7 @@ def find_route(request):
                 messages.error(request, "Please select different locations.")
                 return render(request, "home.html")
             
-            # Dijkstra Routing between the actual stations
+            # Dijkstra Routing
             cost, path_with_routes = dijkstra(graph, route_info, from_station, to_station, debug=False)
             
             if cost == float("inf"):
@@ -247,10 +256,10 @@ def find_route(request):
             num_transfers = max(0, len(route_segments) - 1)
             simple_path = [station_info['station'] for station_info in path_with_routes]
             
-            avg_speed_of_bus = 26 # km/h
+            avg_speed_of_bus = 26  # km/h
             transit_travel_time = (cost / avg_speed_of_bus) * 60
             
-            avg_walking_speed = 5 # km/h
+            avg_walking_speed = 5  # km/h
             walk_time = ((walk_start_distance + walk_end_distance) / avg_walking_speed) * 60
             
             total_time = transit_travel_time + walk_time
@@ -312,13 +321,12 @@ def find_route(request):
             )
             
         except Exception as e:
-            messages.error(request, "An error occurred while finding the route.")
             import logging
-            logging.error(f"Error in route finding: {str(e)}")
+            logging.error(f"Route finding error: {str(e)}", exc_info=True)
+            messages.error(request, f"Error: {str(e)}")
             return render(request, "home.html")
     
     return render(request, "home.html")
-
 
 @ratelimit(key='ip', rate='5/m', method='POST', block=True)
 @csrf_protect
