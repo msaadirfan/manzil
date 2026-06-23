@@ -1,6 +1,6 @@
 Manzil is a metro route-finding app designed to help users navigate Karachi's metro system. Built using Django for the backend and Bootstrap for the frontend, this app uses Dijkstra's Algorithm and graph theory to calculate the most efficient routes between metro stations.
 
-Visit Website: https://manzil-qtng.onrender.com/
+Visit Website: [https://manzil-karachi.vercel.app/](https://manzil-karachi.vercel.app/)
 
 Features
 
