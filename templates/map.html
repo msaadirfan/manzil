@@ -414,9 +414,9 @@
     // Initialize map with DARK tiles
     const map = L.map("map").setView([24.8607, 67.0011], 12);
 
-    L.tileLayer('https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_498s_1_72861e20092450a6ab269324', {
-        attribution: '&copy; OpenStreetMap contributors &amp; CARTO'
-    }).addTo(map);
+   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?apiKey=cb1_498s_1_72861e20092450a6ab269324', {
+    attribution: '&copy; OpenStreetMap contributors &amp; CARTO'
+}).addTo(map);
 
     // Store route layers for toggling
     const routeLayerGroups = {};
